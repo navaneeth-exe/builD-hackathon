@@ -1,8 +1,9 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, ParkingSquare, BookOpen, QrCode,
-  Settings, LogOut, Brain, Car, Search, Leaf,
+  Settings, LogOut, Brain, Car, Search,
 } from 'lucide-react';
+import ParkSyncLogo from './ParkSyncLogo';
 import { useAuth } from '../contexts/AuthContext';
 
 /* ── Nav item definition ── */
@@ -140,16 +141,7 @@ export default function Sidebar() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {/* Logo mark */}
-          <div style={{
-            width: 36, height: 36,
-            borderRadius: 10,
-            background: 'linear-gradient(135deg, #C7F36B 0%, #A8D44E 100%)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(199,243,107,0.30)',
-            flexShrink: 0,
-          }}>
-            <Leaf size={20} color="#174C3C" strokeWidth={2.5} />
-          </div>
+          <ParkSyncLogo size={36} style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.25)', borderRadius: 11 }} />
 
           {/* Wordmark */}
           <div className="sidebar-wordmark">

@@ -3,8 +3,9 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import {
   Eye, EyeOff, Loader2, KeyRound, Sparkles, ShieldCheck,
-  MapPin, Clock, Zap, ArrowRight,
+  Clock, Zap, ArrowRight,
 } from 'lucide-react';
+import ParkSyncLogo from '../components/ParkSyncLogo';
 
 /* ── tiny inline SVG campus illustration ── */
 const CampusIllustration = () => (
@@ -178,20 +179,13 @@ export default function Login() {
         }} />
 
         {/* Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 'auto' }}>
-          <div style={{
-            width: 42, height: 42, borderRadius: 12,
-            background: '#C7F36B',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 6px 16px rgba(199, 243, 107, 0.35)',
-          }}>
-            <MapPin size={22} color="#174C3C" strokeWidth={2.5} />
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 'auto' }}>
+          <ParkSyncLogo size={46} style={{ boxShadow: '0 8px 24px rgba(0,0,0,0.3)', borderRadius: 14 }} />
           <div>
-            <div style={{ color: '#fff', fontWeight: 800, fontSize: 20, letterSpacing: '-0.03em', lineHeight: 1.1 }}>
+            <div style={{ color: '#fff', fontWeight: 800, fontSize: 22, letterSpacing: '-0.03em', lineHeight: 1.1 }}>
               ParkSync
             </div>
-            <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: 10.5, fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+            <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', marginTop: 3 }}>
               Smart Campus Parking
             </div>
           </div>

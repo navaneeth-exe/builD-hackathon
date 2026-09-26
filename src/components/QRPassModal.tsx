@@ -1,5 +1,6 @@
 import { QRCodeSVG } from 'qrcode.react';
-import { X, Download, Leaf, MapPin, Calendar, Clock, CheckCircle } from 'lucide-react';
+import { X, Download, MapPin, Calendar, Clock, CheckCircle } from 'lucide-react';
+import ParkSyncLogo from './ParkSyncLogo';
 import type { Booking } from '../types';
 import StatusBadge from './StatusBadge';
 import { formatDate, formatTime } from '../api';
@@ -54,8 +55,8 @@ export default function QRPassModal({ booking, onClose }: QRPassModalProps) {
                  <X size={16} />
                </button>
 
-               <div style={{ width: 48, height: 48, borderRadius: 16, background: '#C7F36B', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, boxShadow: '0 8px 16px rgba(199,243,107,0.3)' }}>
-                  <Leaf size={24} color="#174C3C" />
+               <div style={{ marginBottom: 16 }}>
+                  <ParkSyncLogo size={48} style={{ borderRadius: 15, boxShadow: '0 8px 18px rgba(0,0,0,0.18)' }} />
                </div>
                
                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#1A2420', letterSpacing: '-0.02em' }}>Digital Parking Pass</h3>
