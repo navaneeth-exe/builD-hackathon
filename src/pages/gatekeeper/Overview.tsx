@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle, QrCode, LayoutDashboard } from 'lucide-react';
+import { CheckCircle, QrCode, LayoutDashboard, ShieldCheck, Clock, User, ArrowRight } from 'lucide-react';
 import TopBar from '../../components/TopBar';
 import StatusBadge from '../../components/StatusBadge';
 import { supabase } from '../../lib/supabase';
@@ -49,90 +49,121 @@ export default function Overview() {
     <>
       <TopBar title="Overview" subtitle="Gatekeeper Command Center" />
       <div className="app-content">
-        
-        {/* Dashboard Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14, marginBottom: 22, maxWidth: 980, margin: '0 auto 22px' }}>
-          <div className="soft-stat-card">
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: '#EDF2EE', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <LayoutDashboard size={20} color="#174C3C" />
-            </div>
-            <div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: '#174C3C', lineHeight: 1 }}>{stats.total}</div>
-              <div style={{ fontSize: 12, color: '#68736B', marginTop: 4, fontWeight: 600 }}>Total Slots</div>
-            </div>
+        <div style={{ maxWidth: 1040, margin: '0 auto', padding: '0 16px' }}>
+          
+          {/* Welcome Banner */}
+          <div className="soft-card" style={{ padding: '32px', borderRadius: 28, background: 'linear-gradient(135deg, #174C3C 0%, #0B2920 100%)', color: '#FFFFFF', marginBottom: 24, boxShadow: '0 24px 48px rgba(23,76,60,0.2)' }}>
+             <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 12 }}>
+                <div style={{ width: 48, height: 48, borderRadius: 16, background: '#C7F36B', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 16px rgba(199,243,107,0.2)' }}>
+                   <ShieldCheck size={24} color="#174C3C" />
+                </div>
+                <div>
+                   <h2 style={{ margin: 0, fontSize: 24, fontWeight: 800, letterSpacing: '-0.02em', color: '#FFFFFF' }}>Gatekeeper Overview</h2>
+                   <p style={{ margin: '4px 0 0 0', fontSize: 14, color: '#A7C9BE' }}>Monitor campus parking capacity and active reservations.</p>
+                </div>
+             </div>
           </div>
-          <div className="soft-stat-card">
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: '#DDF5E5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <CheckCircle size={20} color="#065F46" />
-            </div>
-            <div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: '#065F46', lineHeight: 1 }}>{stats.available}</div>
-              <div style={{ fontSize: 12, color: '#68736B', marginTop: 4, fontWeight: 600 }}>Available Slots</div>
-            </div>
-          </div>
-          <div className="soft-stat-card">
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: '#FEF0C7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <LayoutDashboard size={20} color="#92400E" />
-            </div>
-            <div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: '#92400E', lineHeight: 1 }}>{stats.reserved}</div>
-              <div style={{ fontSize: 12, color: '#68736B', marginTop: 4, fontWeight: 600 }}>Reserved Slots</div>
-            </div>
-          </div>
-          <div className="soft-stat-card">
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: '#FCE2E2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <QrCode size={20} color="#B91C1C" />
-            </div>
-            <div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: '#B91C1C', lineHeight: 1 }}>{stats.occupied}</div>
-              <div style={{ fontSize: 12, color: '#68736B', marginTop: 4, fontWeight: 600 }}>Occupied Slots</div>
-            </div>
-          </div>
-          <div className="soft-stat-card">
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: '#E8F4EF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <CheckCircle size={20} color="#174C3C" />
-            </div>
-            <div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: '#174C3C', lineHeight: 1 }}>{todayCheckins}</div>
-              <div style={{ fontSize: 12, color: '#68736B', marginTop: 4, fontWeight: 600 }}>Today's Scans</div>
-            </div>
-          </div>
-        </div>
 
-        {/* Recent Activity Table */}
-        <div style={{ maxWidth: 980, margin: '22px auto 0' }}>
-          <div className="soft-card" style={{ padding: 0, overflow: 'hidden' }}>
-            <div style={{ padding: '16px 22px', borderBottom: '1.5px solid #E5EAE4', fontWeight: 700, fontSize: 14, color: '#174C3C' }}>
-              Recent Check-in & Gate Activity
+          {/* Dashboard Stats */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 32 }}>
+            <div className="soft-card" style={{ padding: '24px', borderRadius: 24, background: '#FFFFFF', border: '1px solid #EAEFEA', boxShadow: '0 12px 24px rgba(23,76,60,0.04)' }}>
+              <div style={{ width: 48, height: 48, borderRadius: 16, background: '#F8FAF7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, border: '1px solid #EAEFEA' }}>
+                <LayoutDashboard size={20} color="#174C3C" />
+              </div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: '#1A2420', lineHeight: 1 }}>{stats.total}</div>
+              <div style={{ fontSize: 13, color: '#627068', marginTop: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Slots</div>
             </div>
+            
+            <div className="soft-card" style={{ padding: '24px', borderRadius: 24, background: '#FFFFFF', border: '1px solid #DDF5E5', boxShadow: '0 12px 24px rgba(6,95,70,0.06)' }}>
+              <div style={{ width: 48, height: 48, borderRadius: 16, background: '#DDF5E5', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                <CheckCircle size={20} color="#059669" />
+              </div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: '#059669', lineHeight: 1 }}>{stats.available}</div>
+              <div style={{ fontSize: 13, color: '#065F46', marginTop: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Available</div>
+            </div>
+            
+            <div className="soft-card" style={{ padding: '24px', borderRadius: 24, background: '#FFFFFF', border: '1px solid #FEF0C7', boxShadow: '0 12px 24px rgba(146,64,14,0.06)' }}>
+              <div style={{ width: 48, height: 48, borderRadius: 16, background: '#FEF0C7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                <LayoutDashboard size={20} color="#B45309" />
+              </div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: '#B45309', lineHeight: 1 }}>{stats.reserved}</div>
+              <div style={{ fontSize: 13, color: '#92400E', marginTop: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Reserved</div>
+            </div>
+            
+            <div className="soft-card" style={{ padding: '24px', borderRadius: 24, background: '#FFFFFF', border: '1px solid #FEE2E2', boxShadow: '0 12px 24px rgba(220,38,38,0.06)' }}>
+              <div style={{ width: 48, height: 48, borderRadius: 16, background: '#FEE2E2', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+                <QrCode size={20} color="#DC2626" />
+              </div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: '#DC2626', lineHeight: 1 }}>{stats.occupied}</div>
+              <div style={{ fontSize: 13, color: '#991B1B', marginTop: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Occupied</div>
+            </div>
+            
+            <div className="soft-card" style={{ padding: '24px', borderRadius: 24, background: '#1A2420', boxShadow: '0 12px 32px rgba(11,21,16,0.3)' }}>
+              <div style={{ width: 48, height: 48, borderRadius: 16, background: 'rgba(199,243,107,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, border: '1px solid rgba(199,243,107,0.2)' }}>
+                <CheckCircle size={20} color="#C7F36B" />
+              </div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: '#FFFFFF', lineHeight: 1 }}>{todayCheckins}</div>
+              <div style={{ fontSize: 13, color: '#C7F36B', marginTop: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Today's Scans</div>
+            </div>
+          </div>
+
+          {/* Recent Activity Table */}
+          <div className="soft-card" style={{ padding: '32px', borderRadius: 28, background: '#FFFFFF', boxShadow: '0 24px 48px rgba(23,76,60,0.04)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+               <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#1A2420', letterSpacing: '-0.01em' }}>Recent Gate Activity</h3>
+            </div>
+            
             {recentBookings.length === 0 ? (
-              <div style={{ padding: 36, textAlign: 'center', color: '#68736B', fontSize: 13 }}>No recent activity found.</div>
+              <div style={{ padding: '48px 0', textAlign: 'center' }}>
+                 <div style={{ width: 56, height: 56, borderRadius: 16, background: '#F8FAF7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', border: '1px dashed #D5DDD6' }}>
+                    <Clock size={24} color="#9AADA5" />
+                 </div>
+                 <div style={{ fontSize: 15, fontWeight: 700, color: '#627068' }}>No recent activity</div>
+              </div>
             ) : (
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-                <thead>
-                  <tr style={{ background: '#F8FAF8', textAlign: 'left', color: '#68736B', borderBottom: '1px solid #E5EAE4' }}>
-                    <th style={{ padding: '14px 22px', fontWeight: 700, fontSize: 12, textTransform: 'uppercase' }}>Driver</th>
-                    <th style={{ padding: '14px 22px', fontWeight: 700, fontSize: 12, textTransform: 'uppercase' }}>Slot</th>
-                    <th style={{ padding: '14px 22px', fontWeight: 700, fontSize: 12, textTransform: 'uppercase' }}>Booking Time</th>
-                    <th style={{ padding: '14px 22px', fontWeight: 700, fontSize: 12, textTransform: 'uppercase' }}>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentBookings.map(b => (
-                    <tr key={b.id} style={{ borderTop: '1px solid #EEF2EF' }}>
-                      <td style={{ padding: '14px 22px', fontWeight: 600, color: '#174C3C' }}>{b.user_name}</td>
-                      <td style={{ padding: '14px 22px', fontWeight: 700 }}>{b.parking_slots?.slot_number}</td>
-                      <td style={{ padding: '14px 22px', color: '#68736B' }}>{formatTime(b.start_time)}</td>
-                      <td style={{ padding: '14px 22px' }}><StatusBadge status={b.status} small /></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {recentBookings.map(b => (
+                  <div key={b.id} style={{ 
+                      display: 'flex', alignItems: 'center', gap: 16, 
+                      padding: '16px 20px', background: '#F8FAF7', borderRadius: 16,
+                      border: '1px solid #EAEFEA', transition: 'background 0.2s',
+                  }} onMouseOver={e => e.currentTarget.style.background = '#FFFFFF'} onMouseOut={e => e.currentTarget.style.background = '#F8FAF7'}>
+                      
+                      {/* Driver Avatar */}
+                      <div style={{ width: 44, height: 44, borderRadius: 14, background: '#E3EBE6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                         <User size={20} color="#174C3C" />
+                      </div>
+                      
+                      {/* Details */}
+                      <div style={{ flex: 1, minWidth: 0, display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 16, alignItems: 'center' }}>
+                          <div>
+                              <div style={{ fontSize: 14, fontWeight: 700, color: '#1A2420', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{b.user_name}</div>
+                              <div style={{ fontSize: 12, color: '#627068', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                                 <Clock size={12} /> {formatTime(b.start_time)}
+                              </div>
+                          </div>
+                          
+                          <div>
+                              <div style={{ fontSize: 11, color: '#9AADA5', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Slot</div>
+                              <div style={{ fontSize: 14, fontWeight: 800, color: '#174C3C', marginTop: 2 }}>{b.parking_slots?.slot_number}</div>
+                          </div>
+                          
+                          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                              <StatusBadge status={b.status} small />
+                          </div>
+                      </div>
+                      
+                      {/* Action */}
+                      <div style={{ width: 32, height: 32, borderRadius: 10, background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #EAEFEA', color: '#9AADA5', cursor: 'pointer' }}>
+                         <ArrowRight size={14} />
+                      </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </div>
       </div>
-
     </>
   );
 }

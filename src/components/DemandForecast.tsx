@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { fetchParkingDemandForecast } from '../api';
-import { BarChart2, AlertCircle } from 'lucide-react';
+import { TrendingUp, AlertCircle } from 'lucide-react';
 
 export default function DemandForecast() {
   const [minutes, setMinutes] = useState(30);
@@ -37,28 +37,29 @@ export default function DemandForecast() {
   };
 
   return (
-    <div className="soft-card" style={{ padding: 24, marginTop: 24 }}>
+    <div className="soft-card" style={{ padding: '24px 28px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
         <div>
-          <h2 style={{ margin: 0, fontSize: 16, color: '#174C3C', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <BarChart2 size={18} /> AI Demand Forecast
+          <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#1A2420', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <TrendingUp size={18} color="#174C3C" /> Demand Forecast
           </h2>
-          <p style={{ margin: '4px 0 0 0', fontSize: 12, color: '#68736B' }}>
-            Predicting occupancy for {getRelativeTime(minutes)}
+          <p style={{ margin: '4px 0 0 0', fontSize: 13, color: '#627068', fontWeight: 500 }}>
+            Predicting occupancy at {getRelativeTime(minutes)}
           </p>
         </div>
         
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 6, background: '#F8FAF7', padding: 4, borderRadius: 12, border: '1px solid #E3EBE6' }}>
           {[30, 60, 120].map((m) => (
             <button
               key={m}
               onClick={() => setMinutes(m)}
               style={{
-                background: minutes === m ? '#174C3C' : '#F7F8F4',
-                color: minutes === m ? '#C7F36B' : '#68736B',
-                border: 'none', padding: '6px 12px', borderRadius: 8,
-                fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                transition: 'all 0.2s'
+                background: minutes === m ? '#FFFFFF' : 'transparent',
+                color: minutes === m ? '#174C3C' : '#627068',
+                boxShadow: minutes === m ? '0 2px 8px rgba(23,76,60,0.08)' : 'none',
+                border: 'none', padding: '6px 14px', borderRadius: 8,
+                fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                transition: 'all 0.2s', letterSpacing: '0.02em'
               }}
             >
               {m === 120 ? '2h' : `${m}m`}
@@ -70,44 +71,46 @@ export default function DemandForecast() {
       {loading ? (
         <div style={{ padding: 40, textAlign: 'center' }}><div className="spinner" style={{ margin: '0 auto' }} /></div>
       ) : forecast.length === 0 ? (
-        <div style={{ padding: 20, textAlign: 'center', color: '#909A94', fontSize: 13 }}>
+        <div style={{ padding: 30, textAlign: 'center', color: '#9AADA5', fontSize: 13, fontWeight: 500 }}>
           No forecast data available.
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {forecast.map(f => (
             <div key={f.lot_id} style={{ 
-              border: '1px solid #E5EAE4', borderRadius: 12, padding: 16,
-              background: '#fff' 
+              border: '1px solid #E3EBE6', borderRadius: 16, padding: 16,
+              background: '#FFFFFF', transition: 'all 0.2s ease',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
             }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-                <div style={{ fontWeight: 600, color: '#202923', fontSize: 14 }}>{f.lot_name}</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <div style={{ fontWeight: 700, color: '#1A2420', fontSize: 14 }}>{f.lot_name}</div>
                 <div style={{ 
-                  background: `${getDemandColor(f.demand_level)}20`,
+                  background: `${getDemandColor(f.demand_level)}15`,
                   color: getDemandColor(f.demand_level),
-                  padding: '4px 8px', borderRadius: 6, fontSize: 11, fontWeight: 700
+                  padding: '4px 10px', borderRadius: 8, fontSize: 11, fontWeight: 700,
+                  textTransform: 'uppercase', letterSpacing: '0.05em'
                 }}>
                   {f.demand_level}
                 </div>
               </div>
               
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 12, color: '#68736B' }}>
-                <span>Occupied: <strong style={{ color: '#202923' }}>{f.predicted_occupied}</strong></span>
-                <span>Available: <strong style={{ color: '#202923' }}>{f.predicted_available}</strong></span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10, fontSize: 13, color: '#627068', fontWeight: 500 }}>
+                <span>Occupied: <strong style={{ color: '#1A2420', fontWeight: 700 }}>{f.predicted_occupied}</strong></span>
+                <span>Available: <strong style={{ color: '#1A2420', fontWeight: 700 }}>{f.predicted_available}</strong></span>
               </div>
               
-              <div style={{ width: '100%', height: 6, background: '#F7F8F4', borderRadius: 3, overflow: 'hidden' }}>
+              <div style={{ width: '100%', height: 8, background: '#F0F4F1', borderRadius: 4, overflow: 'hidden' }}>
                 <div style={{ 
                   width: `${(f.predicted_occupied / f.total_capacity) * 100}%`, 
                   height: '100%', 
                   background: getDemandColor(f.demand_level),
-                  transition: 'width 0.5s ease-in-out'
+                  transition: 'width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)'
                 }} />
               </div>
               
               {f.demand_level === 'Full' || f.demand_level === 'High' ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 12, fontSize: 11, color: '#DC2626' }}>
-                  <AlertCircle size={12} /> Expected to be busy. Consider alternatives.
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 14, fontSize: 12, color: '#DC2626', fontWeight: 500 }}>
+                  <AlertCircle size={14} /> Expected to be busy. Consider alternatives.
                 </div>
               ) : null}
             </div>

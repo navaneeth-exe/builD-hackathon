@@ -4,7 +4,7 @@ import StatusBadge from '../../components/StatusBadge';
 import { supabase } from '../../lib/supabase';
 import { fetchAllBookings, updateBookingStatus, formatTime } from '../../api';
 import type { Booking } from '../../types';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Car, MapPin, User, LogOut } from 'lucide-react';
 
 export default function ActiveVehicles() {
   const [activeBookings, setActiveBookings] = useState<Booking[]>([]);
@@ -56,57 +56,88 @@ export default function ActiveVehicles() {
     <>
       <TopBar title="Active Vehicles" subtitle="Currently parked vehicles on campus" />
       <div className="app-content">
-        <div className="soft-card" style={{ padding: 0, overflow: 'hidden', maxWidth: 1040, margin: '0 auto' }}>
-          {loading ? (
-             <div style={{ padding: 48, textAlign: 'center' }}><Loader2 className="spinner" /></div>
-          ) : activeBookings.length === 0 ? (
-            <div style={{ padding: 56, textAlign: 'center', color: '#68736B' }}>
-              <div style={{ fontSize: 15, fontWeight: 700, color: '#174C3C', marginBottom: 4 }}>No Vehicles Currently Checked In</div>
-              <p style={{ fontSize: 12.5, color: '#68736B' }}>When drivers scan their QR code at the gate, their vehicles will display live here.</p>
+        <div style={{ maxWidth: 1040, margin: '0 auto', padding: '0 16px' }}>
+          <div className="soft-card" style={{ padding: '32px', borderRadius: 28, background: '#FFFFFF', boxShadow: '0 24px 48px rgba(23,76,60,0.04)' }}>
+            
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+               <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#1A2420', letterSpacing: '-0.01em' }}>Currently Checked In</h3>
+               <div style={{ padding: '6px 12px', background: '#E3EBE6', borderRadius: 12, fontSize: 12, fontWeight: 700, color: '#174C3C' }}>
+                  {activeBookings.length} Vehicle{activeBookings.length !== 1 ? 's' : ''}
+               </div>
             </div>
-          ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-              <thead>
-                <tr style={{ background: '#F8FAF8', textAlign: 'left', color: '#68736B', borderBottom: '1.5px solid #E5EAE4' }}>
-                  <th style={{ padding: '16px 22px', fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Driver & Role</th>
-                  <th style={{ padding: '16px 22px', fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Vehicle Plate</th>
-                  <th style={{ padding: '16px 22px', fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Assigned Spot</th>
-                  <th style={{ padding: '16px 22px', fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Checked In At</th>
-                  <th style={{ padding: '16px 22px', fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'right' }}>Action</th>
-                </tr>
-              </thead>
-              <tbody>
+
+            {loading ? (
+               <div style={{ padding: 48, textAlign: 'center' }}><Loader2 className="spinner" size={32} color="#174C3C" style={{ margin: '0 auto' }} /></div>
+            ) : activeBookings.length === 0 ? (
+              <div style={{ padding: '48px 0', textAlign: 'center' }}>
+                 <div style={{ width: 56, height: 56, borderRadius: 16, background: '#F8FAF7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', border: '1px dashed #D5DDD6' }}>
+                    <Car size={24} color="#9AADA5" />
+                 </div>
+                 <div style={{ fontSize: 15, fontWeight: 700, color: '#174C3C', marginBottom: 4 }}>No Vehicles Checked In</div>
+                 <p style={{ fontSize: 13, color: '#68736B', margin: 0 }}>Vehicles will appear here once drivers scan in at the gate.</p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {activeBookings.map(b => (
-                  <tr key={b.id} style={{ borderTop: '1px solid #EEF2EF', transition: 'background 0.15s ease' }}>
-                    <td style={{ padding: '16px 22px' }}>
-                      <div style={{ fontWeight: 700, color: '#174C3C', fontSize: 13.5 }}>{b.user_name}</div>
-                      <div style={{ fontSize: 11.5, color: '#68736B', textTransform: 'capitalize' }}>{b.user_role}</div>
-                    </td>
-                    <td style={{ padding: '16px 22px', fontWeight: 700, color: '#202923', fontFamily: 'monospace', fontSize: 13 }}>
-                      {b.license_plate && b.license_plate !== 'N/A' ? b.license_plate : '—'}
-                    </td>
-                    <td style={{ padding: '16px 22px' }}>
-                      <span style={{ fontWeight: 800, marginRight: 8, color: '#174C3C' }}>{b.parking_slots?.slot_number ?? '—'}</span>
-                      <StatusBadge status="CHECKED_IN" small />
-                    </td>
-                    <td style={{ padding: '16px 22px', color: '#68736B', fontWeight: 500 }}>
-                      {formatTime(b.checked_in_at ?? b.start_time)}
-                    </td>
-                    <td style={{ padding: '16px 22px', textAlign: 'right' }}>
-                      <button 
-                        className="btn-secondary" 
-                        style={{ padding: '8px 16px', borderRadius: 10, fontSize: 12.5, fontWeight: 700 }}
-                        disabled={actionLoading === b.id}
-                        onClick={() => handleCheckout(b.id)}
-                      >
-                        {actionLoading === b.id ? 'Processing…' : 'Gate Check Out'}
-                      </button>
-                    </td>
-                  </tr>
+                  <div key={b.id} style={{ 
+                      display: 'flex', alignItems: 'center', gap: 16, 
+                      padding: '20px', background: '#F8FAF7', borderRadius: 20,
+                      border: '1px solid #EAEFEA', transition: 'background 0.2s',
+                  }} onMouseOver={e => e.currentTarget.style.background = '#FFFFFF'} onMouseOut={e => e.currentTarget.style.background = '#F8FAF7'}>
+                      
+                      {/* Driver Avatar */}
+                      <div style={{ width: 48, height: 48, borderRadius: 16, background: '#E3EBE6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                         <User size={24} color="#174C3C" />
+                      </div>
+                      
+                      {/* Details Grid */}
+                      <div style={{ flex: 1, minWidth: 0, display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: 16, alignItems: 'center' }}>
+                          <div>
+                              <div style={{ fontSize: 15, fontWeight: 800, color: '#1A2420', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{b.user_name}</div>
+                              <div style={{ fontSize: 12, color: '#627068', marginTop: 4, textTransform: 'capitalize', fontWeight: 600 }}>
+                                 {b.user_role}
+                              </div>
+                          </div>
+
+                          <div>
+                              <div style={{ fontSize: 11, color: '#9AADA5', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Vehicle Plate</div>
+                              <div style={{ fontSize: 14, fontWeight: 800, color: '#202923', marginTop: 4, fontFamily: 'monospace' }}>
+                                {b.license_plate && b.license_plate !== 'N/A' ? b.license_plate : '—'}
+                              </div>
+                          </div>
+                          
+                          <div>
+                              <div style={{ fontSize: 11, color: '#9AADA5', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Assigned Slot</div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                                 <MapPin size={14} color="#174C3C" />
+                                 <span style={{ fontSize: 14, fontWeight: 800, color: '#174C3C' }}>{b.parking_slots?.slot_number ?? '—'}</span>
+                              </div>
+                          </div>
+
+                          <div>
+                              <div style={{ fontSize: 11, color: '#9AADA5', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Checked In</div>
+                              <div style={{ fontSize: 14, fontWeight: 700, color: '#1A2420', marginTop: 4 }}>
+                                {formatTime(b.checked_in_at ?? b.start_time)}
+                              </div>
+                          </div>
+                      </div>
+                      
+                      {/* Action */}
+                      <div style={{ marginLeft: 16 }}>
+                        <button 
+                          className="btn-secondary" 
+                          style={{ padding: '10px 16px', borderRadius: 14, fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}
+                          disabled={actionLoading === b.id}
+                          onClick={() => handleCheckout(b.id)}
+                        >
+                          {actionLoading === b.id ? 'Processing…' : <><LogOut size={16} /> Check Out</>}
+                        </button>
+                      </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
-          )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </>

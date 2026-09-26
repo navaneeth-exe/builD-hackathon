@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ParkingSquare, Car, Zap, MapPin, Clock } from 'lucide-react';
+import { ParkingSquare, Car, Zap, MapPin, Clock, ArrowRight, Activity, Calendar } from 'lucide-react';
 import TopBar from '../components/TopBar';
 import StatCard from '../components/StatCard';
 import ParkingGrid, { ParkingLegend } from '../components/ParkingGrid';
@@ -83,183 +83,296 @@ export default function Dashboard() {
   const { profile } = useAuth();
   
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
   return (
     <>
-      <TopBar title={`${greeting}, ${profile?.full_name?.split(' ')[0] || 'User'}! 👋`} subtitle="Find and manage your parking spots" />
+      <TopBar title="Overview" subtitle="Smart Campus Parking" />
 
-      <div className="app-content">
-        {/* Stats row */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
-          <StatCard
-            label="Total Slots" value={stats.total}
-            icon={<ParkingSquare size={18} />}
-            accent="#E8F4EF" iconColor="#174C3C"
-          />
-          <StatCard
-            label="Available" value={stats.available}
-            icon={<Car size={18} />}
-            accent="#DDF5E5" iconColor="#065F46"
-            pct={stats.total ? `${Math.round((stats.available / stats.total) * 100)}%` : undefined}
-          />
-          <StatCard
-            label="Reserved" value={stats.reserved}
-            icon={<Clock size={18} />}
-            accent="#FEF0C7" iconColor="#92400E"
-            pct={stats.total ? `${Math.round((stats.reserved / stats.total) * 100)}%` : undefined}
-          />
-          <StatCard
-            label="Occupied" value={stats.occupied}
-            icon={<Zap size={18} />}
-            accent="#FCE2E2" iconColor="#B91C1C"
-            pct={stats.total ? `${Math.round((stats.occupied / stats.total) * 100)}%` : undefined}
-          />
-        </div>
-
-        {/* Main content */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 260px', gap: 14, alignItems: 'start' }}>
-
-          {/* Parking layout */}
-          <div className="soft-card" style={{ padding: '24px' }}>
-            <div className="section-header" style={{ marginBottom: 14 }}>
-              <div>
-                <span className="section-title" style={{ fontSize: 16 }}>Campus Parking Layout</span>
-                <p style={{ fontSize: 12, color: '#68736B', marginTop: 2 }}>Interactive real-time spot matrix and status</p>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                {/* Area selector */}
-                <div style={{ position: 'relative' }}>
-                  <select
-                    value={selectedArea?.id ?? ''}
-                    onChange={e => {
-                      const a = areas.find(x => x.id === e.target.value);
-                      if (a) setSelectedArea(a);
-                    }}
-                    className="soft-input"
-                    style={{ paddingRight: 30, cursor: 'pointer', minWidth: 170, padding: '8px 14px', fontSize: 13 }}
-                  >
-                    {areas.map(a => (
-                      <option key={a.id} value={a.id}>{a.name}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Legend */}
-            <div style={{ marginBottom: 16, padding: '10px 14px', background: '#F8FAF8', borderRadius: 12, border: '1px solid #EAEFEA' }}>
-              <ParkingLegend />
-            </div>
-
-            {/* Grid */}
-            {loading ? (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 60 }}>
-                <div className="spinner" />
-              </div>
-            ) : slots.length === 0 ? (
-              <div className="empty-state">
-                <ParkingSquare size={32} color="#C9CFC8" />
-                <p>No slots found for this area.</p>
-              </div>
-            ) : (
-              <div style={{ overflowX: 'auto', padding: '8px 4px' }}>
-                <ParkingGrid
-                  slots={slots}
-                  selectedSlotId={selectedSlot?.id}
-                  onSlotClick={s => setSelectedSlot(prev => prev?.id === s.id ? null : s)}
-                />
-              </div>
-            )}
-
-            {/* Selected slot info */}
-            {selectedSlot && (
-              <div style={{
-                marginTop: 18, padding: '14px 18px',
-                background: '#F7FBF8', border: '1.5px solid #C7F36B',
-                borderRadius: 14, display: 'flex', alignItems: 'center', gap: 14,
-                boxShadow: '0 4px 14px rgba(23,76,60,0.06)'
-              }}>
-                <div style={{
-                  width: 44, height: 44, borderRadius: 12,
-                  background: '#C7F36B', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontWeight: 800, fontSize: 14, color: '#174C3C', flexShrink: 0,
-                  boxShadow: '0 4px 10px rgba(199,243,107,0.4)',
-                }}>
-                  {selectedSlot.slot_number}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: '#174C3C' }}>Slot {selectedSlot.slot_number} Selected</div>
-                  <div style={{ fontSize: 12, color: '#68736B' }}>
-                    {selectedArea?.name} · {selectedSlot.slot_type}
-                  </div>
-                </div>
-                <button
-                  className="soft-btn-primary"
-                  style={{ width: 'auto', padding: '10px 18px', fontSize: 13 }}
-                  onClick={() => navigate('/reserve', { state: { slot: selectedSlot, area: selectedArea } })}
-                >
-                  Reserve Slot →
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Right panel: parking areas list */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <div className="soft-card" style={{ padding: '20px' }}>
-              <div className="section-title" style={{ marginBottom: 12, fontSize: 14 }}>Parking Locations</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {areas.map(area => {
-                  const isSelected = selectedArea?.id === area.id;
-                  return (
-                    <div
-                      key={area.id}
-                      className={`area-item${isSelected ? ' active' : ''}`}
-                      onClick={() => setSelectedArea(area)}
-                      style={{
-                        padding: '10px 12px',
-                        borderRadius: 12,
-                        transition: 'all 0.18s ease',
-                      }}
-                    >
-                      <div className="area-icon">
-                        <MapPin size={16} />
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 600, fontSize: 13, color: '#202923' }}>{area.name}</div>
-                        <div style={{ fontSize: 11.5, color: '#68736B' }}>
-                          {slots.filter(() => true).length > 0 && isSelected
-                            ? `${stats.available} available spots`
-                            : area.description ?? ''}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Peak hours hint */}
-            <div className="soft-card" style={{ padding: '16px 18px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, background: '#FEF0C7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Clock size={15} color="#92400E" />
-                </div>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#202923' }}>Peak Campus Hours</span>
-              </div>
-              <div style={{ fontSize: 12.5, fontWeight: 600, color: '#174C3C' }}>10:00 AM – 02:00 PM</div>
-              <div style={{ fontSize: 11.5, color: '#68736B', marginTop: 4, lineHeight: 1.4 }}>
-                Demand is highest during mid-day lectures. Slots fill quickly, reserve beforehand.
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="app-content" style={{ padding: '36px 40px', maxWidth: 1600, margin: '0 auto' }}>
         
-        {/* AI Demand Forecast Section */}
-        <DemandForecast />
+        {/* Main Grid Layout matching the poster reference */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 32, alignItems: 'start' }}>
+           
+           {/* LEFT COLUMN: Hero + Map + Bottom Cards */}
+           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+              
+              {/* Hero Greeting */}
+              <div style={{ padding: '8px 0 16px 0', position: 'relative' }}>
+                 <h1 style={{ 
+                     fontSize: 42, fontWeight: 800, color: '#174C3C', 
+                     letterSpacing: '-0.03em', lineHeight: 1.1, margin: 0
+                 }}>
+                   {greeting},<br/>
+                   <span style={{ color: '#1A2420' }}>{profile?.full_name?.split(' ')[0] || 'User'}!</span> 
+                   <span style={{ 
+                       display: 'inline-block', marginLeft: 12, 
+                       animation: 'wave 2.5s infinite transform-origin: 70% 70%',
+                       transformOrigin: '70% 70%' 
+                   }}>👋</span>
+                 </h1>
+                 <p style={{ fontSize: 16, color: '#627068', marginTop: 12, fontWeight: 500, maxWidth: 400 }}>
+                   Find the best parking spot before you arrive and skip the campus traffic.
+                 </p>
+                 <style>{`
+                    @keyframes wave {
+                        0% { transform: rotate( 0.0deg) }
+                       10% { transform: rotate(14.0deg) }
+                       20% { transform: rotate(-8.0deg) }
+                       30% { transform: rotate(14.0deg) }
+                       40% { transform: rotate(-4.0deg) }
+                       50% { transform: rotate(10.0deg) }
+                       60% { transform: rotate( 0.0deg) }
+                      100% { transform: rotate( 0.0deg) }
+                    }
+                 `}</style>
+              </div>
+
+              {/* Immersive Map Container (3D soft realism) */}
+              <div className="soft-card map-container" style={{ 
+                  position: 'relative', overflow: 'hidden', padding: 0, 
+                  borderRadius: 32, minHeight: 520,
+                  backgroundImage: 'radial-gradient(circle at center, rgba(250, 248, 242, 0.2) 0%, rgba(250, 248, 242, 0.85) 100%), url(/campus-bg.jpg)',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  boxShadow: '0 24px 48px rgba(23,76,60,0.08), inset 0 2px 8px rgba(255,255,255,0.9)',
+                  display: 'flex', flexDirection: 'column'
+              }}>
+                  {/* Floating Action Bar inside map area */}
+                  <div style={{
+                      position: 'absolute', top: 24, left: 24, zIndex: 10,
+                      background: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(16px)',
+                      WebkitBackdropFilter: 'blur(16px)',
+                      padding: '12px 20px', borderRadius: 20, 
+                      boxShadow: '0 12px 32px rgba(23,76,60,0.12), inset 0 1px 0 rgba(255,255,255,1)',
+                      display: 'flex', alignItems: 'center', gap: 16, 
+                      border: '1px solid rgba(227, 235, 230, 0.8)'
+                  }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                          <div style={{ 
+                              width: 44, height: 44, borderRadius: 14, 
+                              background: '#F0F7F4', display: 'flex', 
+                              alignItems: 'center', justifyContent: 'center', color: '#174C3C' 
+                          }}>
+                              <Calendar size={20} />
+                          </div>
+                          <div style={{ borderRight: '1.5px solid #E3EBE6', paddingRight: 20 }}>
+                              <div style={{ fontSize: 11, fontWeight: 800, color: '#627068', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Arrival Time</div>
+                              <div style={{ fontSize: 15, fontWeight: 700, color: '#1A2420', marginTop: 2 }}>Today, Now</div>
+                          </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 14, paddingLeft: 4 }}>
+                          <div style={{ 
+                              width: 44, height: 44, borderRadius: 14, 
+                              background: '#E6F2ED', display: 'flex', 
+                              alignItems: 'center', justifyContent: 'center', color: '#059669' 
+                          }}>
+                              <MapPin size={20} />
+                          </div>
+                          <div>
+                              <div style={{ fontSize: 11, fontWeight: 800, color: '#627068', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Select Zone</div>
+                              <select
+                                value={selectedArea?.id ?? ''}
+                                onChange={e => {
+                                  const a = areas.find(x => x.id === e.target.value);
+                                  if (a) setSelectedArea(a);
+                                }}
+                                style={{ 
+                                    border: 'none', background: 'transparent', 
+                                    fontSize: 15, fontWeight: 700, color: '#1A2420', 
+                                    outline: 'none', cursor: 'pointer', padding: 0, margin: 0, 
+                                    width: 140 
+                                }}
+                              >
+                                {areas.map(a => (
+                                  <option key={a.id} value={a.id}>{a.name}</option>
+                                ))}
+                              </select>
+                          </div>
+                      </div>
+                  </div>
+
+                  {/* Pseudo-3D Isometric Grid Wrapper */}
+                  <div style={{ 
+                      flex: 1, padding: '120px 40px 40px 40px', 
+                      display: 'flex', justifyContent: 'center', alignItems: 'center',
+                      position: 'relative', zIndex: 5
+                  }}>
+                     {loading ? (
+                        <div className="spinner" style={{ margin: 'auto' }} />
+                     ) : slots.length === 0 ? (
+                        <div className="empty-state">No slots found</div>
+                     ) : (
+                        <div style={{
+                            padding: 36, background: 'rgba(255, 255, 255, 0.95)', borderRadius: 32,
+                            boxShadow: '0 32px 64px rgba(23,76,60,0.12), 0 4px 16px rgba(0,0,0,0.04), inset 0 2px 4px rgba(255,255,255,1)',
+                            backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+                            border: '1px solid rgba(255,255,255,0.6)',
+                            transform: 'rotateX(18deg) rotateZ(-2deg) translateY(-10px)', 
+                            transformOrigin: 'center', transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                            cursor: 'grab'
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.transform = 'rotateX(0deg) rotateZ(0deg) translateY(0)'; e.currentTarget.style.boxShadow = '0 16px 40px rgba(23,76,60,0.08), inset 0 2px 4px rgba(255,255,255,1)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.transform = 'rotateX(18deg) rotateZ(-2deg) translateY(-10px)'; e.currentTarget.style.boxShadow = '0 32px 64px rgba(23,76,60,0.12), 0 4px 16px rgba(0,0,0,0.04), inset 0 2px 4px rgba(255,255,255,1)'; }}
+                        >
+                            <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'center' }}>
+                                <ParkingLegend />
+                            </div>
+                            <ParkingGrid 
+                                slots={slots} 
+                                selectedSlotId={selectedSlot?.id} 
+                                onSlotClick={s => setSelectedSlot(prev => prev?.id === s.id ? null : s)} 
+                            />
+                        </div>
+                     )}
+                  </div>
+              </div>
+
+              {/* Bottom Quick widgets */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+                  <div className="soft-card" style={{ padding: '24px 28px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                          <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1A2420', display: 'flex', alignItems: 'center', gap: 10, margin: 0 }}>
+                             <Zap size={18} color="#174C3C" /> 
+                             Quick Actions
+                          </h3>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                         <button className="soft-btn-primary" style={{ background: '#F4F7F4', color: '#174C3C', boxShadow: 'none', padding: '14px', fontSize: 13.5, flexDirection: 'row' }} onClick={() => navigate('/reserve')}>
+                            <Car size={18} /> Book Spot
+                         </button>
+                         <button className="soft-btn-primary" style={{ background: '#F4F7F4', color: '#174C3C', boxShadow: 'none', padding: '14px', fontSize: 13.5, flexDirection: 'row' }} onClick={() => navigate('/bookings')}>
+                            <Clock size={18} /> My Bookings
+                         </button>
+                      </div>
+                  </div>
+                  
+                  {/* Selected Slot Action (only shows when slot clicked, otherwise placeholder) */}
+                  <div className="soft-card" style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                      {selectedSlot ? (
+                          <div>
+                              <div style={{ fontSize: 12, fontWeight: 700, color: '#627068', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>Selected Spot</div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                                  <div style={{ 
+                                      width: 52, height: 52, borderRadius: 16, background: '#C7F36B', 
+                                      display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                                      fontSize: 20, fontWeight: 800, color: '#174C3C', 
+                                      boxShadow: '0 12px 24px rgba(199,243,107,0.35)' 
+                                  }}>
+                                      {selectedSlot.slot_number}
+                                  </div>
+                                  <div style={{ flex: 1 }}>
+                                      <div style={{ fontSize: 15, fontWeight: 700, color: '#1A2420' }}>{selectedSlot.slot_type}</div>
+                                      <div style={{ fontSize: 13, color: '#627068', marginTop: 2 }}>{selectedArea?.name}</div>
+                                  </div>
+                                  <button className="btn-primary" style={{ padding: '12px 20px', borderRadius: 12, background: '#174C3C' }} onClick={() => navigate('/reserve', { state: { slot: selectedSlot, area: selectedArea } })}>
+                                      Reserve →
+                                  </button>
+                              </div>
+                          </div>
+                      ) : (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 16, color: '#9AADA5', height: '100%' }}>
+                              <div style={{ 
+                                  width: 52, height: 52, borderRadius: 16, border: '2px dashed #E3EBE6', 
+                                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                  background: '#F8FAF7'
+                              }}>
+                                  <MapPin size={22} color="#C8D9D0" />
+                              </div>
+                              <div style={{ fontSize: 14, fontWeight: 500, lineHeight: 1.4 }}>
+                                  Select a parking spot on the <br/>map to book instantly.
+                              </div>
+                          </div>
+                      )}
+                  </div>
+              </div>
+           </div>
+
+           {/* RIGHT COLUMN: AI & Stats */}
+           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+               
+               {/* AI Recommendation Card (Hero styling from poster) */}
+               <div className="soft-card" style={{ padding: 24, background: '#FFFFFF' }}>
+                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                       <h3 style={{ fontSize: 15, fontWeight: 700, color: '#1A2420', display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
+                           <Zap size={16} color="#059669" /> AI Recommendation
+                       </h3>
+                       <span style={{ fontSize: 11, fontWeight: 700, color: '#059669', background: '#D9F2E4', padding: '4px 10px', borderRadius: 20 }}>Best Option</span>
+                   </div>
+                   
+                   <div style={{ 
+                       background: 'linear-gradient(145deg, #174C3C, #0E3329)', 
+                       borderRadius: 20, padding: 24, color: '#fff',
+                       position: 'relative', overflow: 'hidden',
+                       boxShadow: '0 16px 32px rgba(23,76,60,0.24)'
+                   }}>
+                       {/* Decorative BG pattern */}
+                       <div style={{ position: 'absolute', right: -30, top: -30, opacity: 0.05, transform: 'rotate(15deg)' }}>
+                           <svg width="180" height="180" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                       </div>
+
+                       <div style={{ position: 'relative', zIndex: 1, display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+                           <div style={{ 
+                               width: 48, height: 48, borderRadius: 14, 
+                               background: '#C7F36B', display: 'flex', 
+                               alignItems: 'center', justifyContent: 'center', color: '#174C3C',
+                               boxShadow: '0 8px 16px rgba(199,243,107,0.2)'
+                           }}>
+                               <MapPin size={24} />
+                           </div>
+                           <div style={{ flex: 1 }}>
+                               <div style={{ fontSize: 22, fontWeight: 800, color: '#FFFFFF', marginBottom: 2, lineHeight: 1.2 }}>
+                                   {selectedArea?.name || 'Loading...'}
+                               </div>
+                               <div style={{ fontSize: 13, color: '#AABCB4', marginBottom: 24, display: 'flex', alignItems: 'center', gap: 6 }}>
+                                   <Activity size={14} color="#C7F36B" /> High Availability
+                               </div>
+                           </div>
+                       </div>
+
+                       <div style={{ 
+                           background: 'rgba(255,255,255,0.08)', borderRadius: 12, padding: '12px 16px', 
+                           display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20,
+                           border: '1px solid rgba(255,255,255,0.1)'
+                       }}>
+                           <div>
+                               <div style={{ fontSize: 11, color: '#AABCB4', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>Predicted Avg</div>
+                               <div style={{ fontSize: 20, fontWeight: 800, color: '#C7F36B', marginTop: 2 }}>
+                                   {stats.total > 0 ? Math.round((stats.available / stats.total) * 100) : 0}%
+                               </div>
+                           </div>
+                           <div style={{ textAlign: 'right' }}>
+                               <div style={{ fontSize: 11, color: '#AABCB4', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>Spaces Left</div>
+                               <div style={{ fontSize: 16, fontWeight: 700, color: '#FFFFFF', marginTop: 4 }}>
+                                   {stats.available} slots
+                               </div>
+                           </div>
+                       </div>
+
+                       <button 
+                           className="soft-btn-primary" 
+                           style={{ background: '#C7F36B', color: '#174C3C', padding: '14px', fontSize: 14, borderRadius: 14, width: '100%' }} 
+                           onClick={() => navigate('/reserve')}
+                       >
+                           Book Parking Spot <ArrowRight size={16} />
+                       </button>
+                   </div>
+               </div>
+
+               {/* Stats Grid */}
+               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                   <StatCard label="Available" value={stats.available} icon={<Car size={18} />} accent="#D9F2E4" iconColor="#065F46" pct={stats.total ? `${Math.round((stats.available / stats.total) * 100)}%` : undefined} />
+                   <StatCard label="Occupied" value={stats.occupied} icon={<ParkingSquare size={18} />} accent="#FCE4E4" iconColor="#B91C1C" pct={stats.total ? `${Math.round((stats.occupied / stats.total) * 100)}%` : undefined} />
+               </div>
+
+               {/* AI Demand Forecast Widget */}
+               <DemandForecast />
+
+           </div>
+        </div>
       </div>
     </>
   );
 }
+
 
