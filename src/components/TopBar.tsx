@@ -1,5 +1,5 @@
-import { Bell } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import NotificationCenter from './NotificationCenter';
 
 interface TopBarProps {
   title: string;
@@ -25,16 +25,7 @@ export default function TopBar({ title, subtitle, children }: TopBarProps) {
 
       {children}
 
-      <button
-        style={{
-          width: 34, height: 34, borderRadius: 8,
-          border: '1px solid #E5EAE4', background: '#fff',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          cursor: 'pointer', color: '#68736B',
-        }}
-      >
-        <Bell size={15} />
-      </button>
+      <NotificationCenter />
 
       {profile && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

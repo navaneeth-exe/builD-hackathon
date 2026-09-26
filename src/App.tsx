@@ -1,4 +1,6 @@
+import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { supabase } from './lib/supabase';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import ReserveParking from './pages/ReserveParking';
@@ -39,6 +41,23 @@ function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode;
 
 function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
+  
+  React.useEffect(() => {
+    if (!user) return;
+    
+    const runScheduler = async () => {
+      const { error } = await supabase.rpc('process_scheduled_notifications');
+      if (error) console.error('Scheduler error:', error);
+    };
+
+    // Initial call
+    runScheduler();
+    
+    // Call every 60 seconds
+    const intervalId = setInterval(runScheduler, 60000);
+    
+    return () => clearInterval(intervalId);
+  }, [user]);
 
   if (loading) return null;
   if (!user) return <>{children}</>;
