@@ -7,6 +7,7 @@ import ReserveParking from './pages/ReserveParking';
 import MyBookings from './pages/MyBookings';
 import ScanQR from './pages/ScanQR';
 import AdminDashboard from './pages/AdminDashboard';
+import ParkingIntelligence from './pages/ParkingIntelligence';
 import ErrorBoundary from './components/ErrorBoundary';
 import Login from './pages/Login';
 import GatekeeperOverview from './pages/gatekeeper/Overview';
@@ -102,6 +103,7 @@ export default function App() {
           <Route path="/gatekeeper/bookings" element={<ProtectedRoute allowedRoles={['staff', 'admin']}><GatekeeperBookings /></ProtectedRoute>} />
           
           <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/admin/intelligence" element={<ProtectedRoute allowedRoles={['admin']}><ParkingIntelligence /></ProtectedRoute>} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

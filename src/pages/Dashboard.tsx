@@ -4,6 +4,7 @@ import { ParkingSquare, Car, Zap, MapPin, Clock } from 'lucide-react';
 import TopBar from '../components/TopBar';
 import StatCard from '../components/StatCard';
 import ParkingGrid, { ParkingLegend } from '../components/ParkingGrid';
+import DemandForecast from '../components/DemandForecast';
 import { supabase } from '../lib/supabase';
 import {
   fetchParkingAreas, fetchSlotsForArea, fetchDashboardStats,
@@ -254,6 +255,9 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+        
+        {/* AI Demand Forecast Section */}
+        <DemandForecast />
       </div>
     </>
   );

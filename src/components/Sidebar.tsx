@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import {
-  LayoutDashboard, ParkingSquare, BookOpen, QrCode, Settings, Leaf, LogOut,
+  LayoutDashboard, ParkingSquare, BookOpen, QrCode, Settings, Leaf, LogOut, Brain,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -29,6 +29,7 @@ export default function Sidebar() {
   } else if (isAdmin) {
     NAV = [
       { to: '/admin',     icon: Settings,         label: 'Admin Settings' },
+      { to: '/admin/intelligence', icon: Brain,   label: 'Parking Intelligence' },
       { to: '/gatekeeper/scan', icon: QrCode,     label: 'Scan QR Pass' }, // Admin can also scan if needed
     ];
   }

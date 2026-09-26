@@ -373,3 +373,21 @@ export function formatDuration(start: string, end: string) {
   if (h > 0) return `${h}h`;
   return `${m}m`;
 }
+
+// ==========================================
+// AI Forecast and Insights
+// ==========================================
+
+export async function fetchParkingDemandForecast(minutesAhead: number) {
+  const { data, error } = await supabase.rpc('get_parking_demand_forecast', {
+    p_minutes: minutesAhead,
+  });
+  if (error) throw error;
+  return data;
+}
+
+export async function fetchParkingInsights() {
+  const { data, error } = await supabase.functions.invoke('parking_insights');
+  if (error) throw error;
+  return data;
+}

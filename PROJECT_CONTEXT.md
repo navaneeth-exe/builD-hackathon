@@ -245,3 +245,26 @@ Supabase credentials are instantiated in `src/lib/supabase.ts`. For production d
 - **Preserve the Design System:** Keep the Forest Green (`#174C3C`) and Neon Lime (`#C7F36B`) palette, custom card components (`.ps-card`), and existing responsive sidebar layout.
 - **Maintain ErrorBoundary & Safe Cleanup:** Whenever modifying camera or video components in `ScanQR.tsx`, ensure DOM container nodes are never abruptly unmounted before media streams stop cleanly.
 - **Strict Typing:** Always run `npm run build` to verify TypeScript builds without errors before concluding tasks.
+
+---
+
+## 13. AI Prediction & Insights Integration
+
+**ParkSync** includes intelligent forecasting and insight generation powered by **Gemini** (with Groq fallback).
+
+### Features Implemented
+- **AI Parking Demand Predictor**: A predictive SQL baseline (using `get_parking_demand_forecast` RPC) that forecasts occupancy across lots for the next 30, 60, and 120 minutes by analyzing confirmed overlapping reservations against total capacity. The client uses this to safely recommend parking.
+- **AI Parking & Traffic Insights**: A specialized Supabase Edge Function (`parking_insights`) computes deterministic system-wide utilization stats via the database, then requests the Gemini API (or Groq API) to explain these insights concisely without inventing data.
+
+### Environment & Setup
+To run the AI Edge Function, configure these secrets in your Supabase project:
+```bash
+supabase secrets set GEMINI_API_KEY="AIzaSy..."
+supabase secrets set GROQ_API_KEY="gsk_..."
+```
+*(No AI keys are exposed in the frontend. All generation happens securely server-side.)*
+
+### Limitations
+- Predictions currently utilize a baseline deterministic approach combining static capacity limits with dynamic upcoming confirmed reservations.
+- True historical machine learning is not enabled because this is an MVP without vast training data.
+- The system gracefully falls back to a deterministic string if both AI API providers fail or are unconfigured.
