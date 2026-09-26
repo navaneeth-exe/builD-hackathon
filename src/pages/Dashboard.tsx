@@ -120,9 +120,12 @@ export default function Dashboard() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 260px', gap: 14, alignItems: 'start' }}>
 
           {/* Parking layout */}
-          <div className="ps-card">
-            <div className="section-header" style={{ marginBottom: 12 }}>
-              <span className="section-title">Campus Parking Layout</span>
+          <div className="soft-card" style={{ padding: '24px' }}>
+            <div className="section-header" style={{ marginBottom: 14 }}>
+              <div>
+                <span className="section-title" style={{ fontSize: 16 }}>Campus Parking Layout</span>
+                <p style={{ fontSize: 12, color: '#68736B', marginTop: 2 }}>Interactive real-time spot matrix and status</p>
+              </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 {/* Area selector */}
                 <div style={{ position: 'relative' }}>
@@ -132,8 +135,8 @@ export default function Dashboard() {
                       const a = areas.find(x => x.id === e.target.value);
                       if (a) setSelectedArea(a);
                     }}
-                    className="ps-input"
-                    style={{ paddingRight: 30, cursor: 'pointer', minWidth: 160 }}
+                    className="soft-input"
+                    style={{ paddingRight: 30, cursor: 'pointer', minWidth: 170, padding: '8px 14px', fontSize: 13 }}
                   >
                     {areas.map(a => (
                       <option key={a.id} value={a.id}>{a.name}</option>
@@ -144,7 +147,7 @@ export default function Dashboard() {
             </div>
 
             {/* Legend */}
-            <div style={{ marginBottom: 12 }}>
+            <div style={{ marginBottom: 16, padding: '10px 14px', background: '#F8FAF8', borderRadius: 12, border: '1px solid #EAEFEA' }}>
               <ParkingLegend />
             </div>
 
@@ -159,7 +162,7 @@ export default function Dashboard() {
                 <p>No slots found for this area.</p>
               </div>
             ) : (
-              <div style={{ overflowX: 'auto' }}>
+              <div style={{ overflowX: 'auto', padding: '8px 4px' }}>
                 <ParkingGrid
                   slots={slots}
                   selectedSlotId={selectedSlot?.id}
@@ -171,25 +174,28 @@ export default function Dashboard() {
             {/* Selected slot info */}
             {selectedSlot && (
               <div style={{
-                marginTop: 16, padding: '12px 14px',
-                background: '#F7FBF8', border: '1px solid #C7F36B',
-                borderRadius: 10, display: 'flex', alignItems: 'center', gap: 14,
+                marginTop: 18, padding: '14px 18px',
+                background: '#F7FBF8', border: '1.5px solid #C7F36B',
+                borderRadius: 14, display: 'flex', alignItems: 'center', gap: 14,
+                boxShadow: '0 4px 14px rgba(23,76,60,0.06)'
               }}>
                 <div style={{
-                  width: 40, height: 40, borderRadius: 8,
+                  width: 44, height: 44, borderRadius: 12,
                   background: '#C7F36B', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontWeight: 700, fontSize: 13, color: '#174C3C', flexShrink: 0,
+                  fontWeight: 800, fontSize: 14, color: '#174C3C', flexShrink: 0,
+                  boxShadow: '0 4px 10px rgba(199,243,107,0.4)',
                 }}>
                   {selectedSlot.slot_number}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600, fontSize: 13 }}>{selectedSlot.slot_number}</div>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: '#174C3C' }}>Slot {selectedSlot.slot_number} Selected</div>
                   <div style={{ fontSize: 12, color: '#68736B' }}>
                     {selectedArea?.name} · {selectedSlot.slot_type}
                   </div>
                 </div>
                 <button
-                  className="btn-primary"
+                  className="soft-btn-primary"
+                  style={{ width: 'auto', padding: '10px 18px', fontSize: 13 }}
                   onClick={() => navigate('/reserve', { state: { slot: selectedSlot, area: selectedArea } })}
                 >
                   Reserve Slot →
@@ -199,41 +205,51 @@ export default function Dashboard() {
           </div>
 
           {/* Right panel: parking areas list */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div className="ps-card" style={{ padding: '16px' }}>
-              <div className="section-title" style={{ marginBottom: 12 }}>Parking Areas</div>
-              {areas.map(area => {
-                return (
-                  <div
-                    key={area.id}
-                    className={`area-item${selectedArea?.id === area.id ? ' active' : ''}`}
-                    onClick={() => setSelectedArea(area)}
-                  >
-                    <div className="area-icon">
-                      <MapPin size={16} />
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 600, fontSize: 13, color: '#202923' }}>{area.name}</div>
-                      <div style={{ fontSize: 11.5, color: '#68736B' }}>
-                        {slots.filter(() => true).length > 0 && selectedArea?.id === area.id
-                          ? `${stats.available} available`
-                          : area.description ?? ''}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div className="soft-card" style={{ padding: '20px' }}>
+              <div className="section-title" style={{ marginBottom: 12, fontSize: 14 }}>Parking Locations</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {areas.map(area => {
+                  const isSelected = selectedArea?.id === area.id;
+                  return (
+                    <div
+                      key={area.id}
+                      className={`area-item${isSelected ? ' active' : ''}`}
+                      onClick={() => setSelectedArea(area)}
+                      style={{
+                        padding: '10px 12px',
+                        borderRadius: 12,
+                        transition: 'all 0.18s ease',
+                      }}
+                    >
+                      <div className="area-icon">
+                        <MapPin size={16} />
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, fontSize: 13, color: '#202923' }}>{area.name}</div>
+                        <div style={{ fontSize: 11.5, color: '#68736B' }}>
+                          {slots.filter(() => true).length > 0 && isSelected
+                            ? `${stats.available} available spots`
+                            : area.description ?? ''}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
 
             {/* Peak hours hint */}
-            <div className="ps-card" style={{ padding: '14px 16px' }}>
+            <div className="soft-card" style={{ padding: '16px 18px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                <Clock size={14} color="#68736B" />
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#202923' }}>Peak Hours</span>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: '#FEF0C7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Clock size={15} color="#92400E" />
+                </div>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#202923' }}>Peak Campus Hours</span>
               </div>
-              <div style={{ fontSize: 12, color: '#68736B' }}>10:00 AM – 02:00 PM</div>
-              <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>
-                Slots fill quickly during peak hours. Reserve early.
+              <div style={{ fontSize: 12.5, fontWeight: 600, color: '#174C3C' }}>10:00 AM – 02:00 PM</div>
+              <div style={{ fontSize: 11.5, color: '#68736B', marginTop: 4, lineHeight: 1.4 }}>
+                Demand is highest during mid-day lectures. Slots fill quickly, reserve beforehand.
               </div>
             </div>
           </div>
@@ -242,3 +258,4 @@ export default function Dashboard() {
     </>
   );
 }
+

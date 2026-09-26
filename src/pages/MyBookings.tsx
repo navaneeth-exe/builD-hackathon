@@ -84,25 +84,29 @@ export default function MyBookings() {
       <TopBar title="My Bookings" subtitle="View and manage your parking reservations" />
       {qrBooking && <QRPassModal booking={qrBooking} onClose={() => setQrBooking(null)} />}
 
-      <div className="app-content" style={{ maxWidth: 800, margin: '0 auto' }}>
+      <div className="app-content" style={{ maxWidth: 840, margin: '0 auto' }}>
         {/* Tabs */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-          <div className="tab-bar">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 22 }}>
+          <div className="soft-tab-bar" style={{ width: 280 }}>
             <button
-              className={`tab-btn${tab === 'upcoming' ? ' active' : ''}`}
+              className={`soft-tab-btn${tab === 'upcoming' ? ' active' : ''}`}
               onClick={() => setTab('upcoming')}
             >
               Upcoming ({upcoming.length})
             </button>
             <button
-              className={`tab-btn${tab === 'past' ? ' active' : ''}`}
+              className={`soft-tab-btn${tab === 'past' ? ' active' : ''}`}
               onClick={() => setTab('past')}
             >
-              Past ({past.length})
+              History ({past.length})
             </button>
           </div>
-          <button className="btn-primary" style={{ marginLeft: 'auto' }} onClick={() => navigate('/reserve')}>
-            + Reserve Parking
+          <button
+            className="soft-btn-primary"
+            style={{ width: 'auto', marginLeft: 'auto', padding: '10px 18px', fontSize: 13 }}
+            onClick={() => navigate('/reserve')}
+          >
+            + New Reservation
           </button>
         </div>
 
@@ -111,75 +115,79 @@ export default function MyBookings() {
             <div className="spinner" />
           </div>
         ) : displayed.length === 0 ? (
-          <div className="empty-state">
-            <BookOpen size={36} color="#C9CFC8" />
-            <div style={{ fontSize: 15, fontWeight: 600, color: '#68736B' }}>
-              {tab === 'upcoming' ? 'No upcoming bookings' : 'No past bookings'}
+          <div className="empty-state soft-card" style={{ padding: '48px 24px', textAlign: 'center' }}>
+            <div style={{ width: 56, height: 56, borderRadius: 16, background: '#EDF2EE', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
+              <BookOpen size={28} color="#174C3C" />
             </div>
-            <p style={{ fontSize: 13, color: '#9CA3AF' }}>
-              {tab === 'upcoming' ? 'Reserve a parking slot to get started.' : 'Your completed bookings will appear here.'}
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#174C3C', marginBottom: 4 }}>
+              {tab === 'upcoming' ? 'No Upcoming Bookings' : 'No Booking History'}
+            </div>
+            <p style={{ fontSize: 13, color: '#68736B', maxWidth: 360, margin: '0 auto 16px' }}>
+              {tab === 'upcoming' ? 'Reserve a parking slot anytime to guarantee your spot across campus.' : 'Your completed and cancelled reservations will be archived here.'}
             </p>
             {tab === 'upcoming' && (
-              <button className="btn-primary" style={{ marginTop: 8 }} onClick={() => navigate('/reserve')}>
-                Reserve Parking
+              <button className="soft-btn-primary" style={{ width: 'auto', margin: '0 auto' }} onClick={() => navigate('/reserve')}>
+                Book a Parking Spot
               </button>
             )}
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {displayed.map(b => {
               const slot = b.parking_slots;
               const area = slot?.parking_areas;
               const canCancel = b.status === 'CONFIRMED' && new Date(b.start_time) > now;
 
               return (
-                <div key={b.id} className="ps-card" style={{ padding: '16px 20px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <div key={b.id} className="soft-card" style={{ padding: '18px 22px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                     {/* Slot badge */}
                     <div style={{
-                      width: 44, height: 44, borderRadius: 10,
+                      width: 48, height: 48, borderRadius: 12,
                       background: '#DDF5E5', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontWeight: 700, fontSize: 13, color: '#065F46', flexShrink: 0,
+                      fontWeight: 800, fontSize: 14, color: '#065F46', flexShrink: 0,
+                      boxShadow: '0 4px 10px rgba(6, 95, 70, 0.1)',
                     }}>
                       {slot?.slot_number ?? '—'}
                     </div>
 
                     {/* Main info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                        <span style={{ fontWeight: 700, fontSize: 14 }}>{slot?.slot_number}</span>
-                        <span style={{ fontSize: 12, color: '#68736B' }}>{area?.name}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+                        <span style={{ fontWeight: 800, fontSize: 15, color: '#174C3C' }}>Slot {slot?.slot_number}</span>
+                        <span style={{ fontSize: 12.5, fontWeight: 500, color: '#68736B' }}>{area?.name}</span>
                         <StatusBadge status={b.status} small />
                       </div>
-                      <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#68736B' }}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                          <Calendar size={11} />
+                      <div style={{ display: 'flex', gap: 18, fontSize: 12.5, color: '#68736B' }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                          <Calendar size={13} color="#174C3C" />
                           {formatDate(b.start_time)}
                         </span>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                          <Clock size={11} />
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                          <Clock size={13} color="#174C3C" />
                           {formatTime(b.start_time)} – {formatTime(b.end_time)} ({formatDuration(b.start_time, b.end_time)})
                         </span>
                       </div>
                     </div>
 
                     {/* Actions */}
-                    <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                    <div style={{ display: 'flex', gap: 10, flexShrink: 0 }}>
                       <button
                         className="btn-secondary"
-                        style={{ padding: '7px 14px', fontSize: 12, display: 'flex', alignItems: 'center', gap: 5 }}
+                        style={{ padding: '9px 16px', borderRadius: 10, fontSize: 12.5, display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600 }}
                         onClick={() => setQrBooking(b)}
                       >
-                        <QrCode size={13} />
-                        View QR
+                        <QrCode size={14} color="#174C3C" />
+                        Digital QR
                       </button>
                       {canCancel && (
                         <button
                           className="btn-danger"
+                          style={{ borderRadius: 10, padding: '9px 14px', fontSize: 12.5 }}
                           disabled={cancellingId === b.id}
                           onClick={() => handleCancel(b)}
                         >
-                          {cancellingId === b.id ? 'Cancelling…' : 'Cancel Booking'}
+                          {cancellingId === b.id ? 'Cancelling…' : 'Cancel'}
                         </button>
                       )}
                     </div>
@@ -193,3 +201,4 @@ export default function MyBookings() {
     </>
   );
 }
+

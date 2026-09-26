@@ -157,27 +157,30 @@ export default function ReserveParking() {
     return (
       <>
         <TopBar title="Booking Confirmation" subtitle="Review your booking details and confirm" />
-        <div className="app-content" style={{ maxWidth: 720, margin: '0 auto' }}>
-          <div className="ps-card" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+        <div className="app-content" style={{ maxWidth: 740, margin: '0 auto' }}>
+          <div className="soft-card" style={{ padding: '28px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28 }}>
             {/* Left: details */}
             <div>
               {/* Slot badge */}
               <div style={{
-                display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20,
-                padding: '12px 14px', background: '#F7FBF8', border: '1px solid #E5EAE4', borderRadius: 10,
+                display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20,
+                padding: '14px 16px', background: '#F7FBF8', border: '1px solid #E2EAE4', borderRadius: 14,
               }}>
                 <div style={{
-                  width: 40, height: 40, borderRadius: 8,
+                  width: 44, height: 44, borderRadius: 12,
                   background: '#DDF5E5', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontWeight: 700, fontSize: 13, color: '#065F46',
+                  fontWeight: 800, fontSize: 14, color: '#065F46',
+                  boxShadow: '0 4px 10px rgba(6, 95, 70, 0.1)',
                 }}>
                   {selectedSlot?.slot_number}
                 </div>
                 <div>
-                  <div style={{ fontWeight: 600 }}>{selectedSlot?.slot_number}</div>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: '#174C3C' }}>Slot {selectedSlot?.slot_number}</div>
                   <div style={{ fontSize: 12, color: '#68736B' }}>{selectedArea?.name}</div>
                 </div>
-                <StatusBadge status="CONFIRMED" />
+                <div style={{ marginLeft: 'auto' }}>
+                  <StatusBadge status="CONFIRMED" />
+                </div>
               </div>
 
               {/* Details */}
@@ -186,46 +189,47 @@ export default function ReserveParking() {
                 { label: 'Time', value: time },
                 { label: 'Parking Area', value: selectedArea?.name },
                 { label: 'Slot Type', value: selectedSlot?.slot_type },
-                { label: 'Price', value: 'Free for students' },
+                { label: 'Vehicle Plate', value: licensePlate || 'N/A' },
+                { label: 'Price', value: 'Free for campus members' },
               ].map(r => (
                 <div key={r.label} style={{
                   display: 'flex', alignItems: 'center',
-                  padding: '9px 0', borderBottom: '1px solid #F0F2EF',
+                  padding: '10px 0', borderBottom: '1px solid #F0F4F1',
                   fontSize: 13,
                 }}>
                   <span style={{ color: '#68736B', width: 110 }}>{r.label}</span>
-                  <span style={{ fontWeight: 500 }}>{r.value}</span>
+                  <span style={{ fontWeight: 600, color: '#202923' }}>{r.value}</span>
                 </div>
               ))}
             </div>
 
             {/* Right: terms + actions */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div style={{
-                background: '#F7F8F4', borderRadius: 8, padding: '14px',
-                fontSize: 12.5, color: '#68736B', lineHeight: 1.6,
+                background: '#F8FAF8', borderRadius: 14, padding: '16px',
+                fontSize: 12.5, color: '#68736B', lineHeight: 1.6, border: '1px solid #E5ECE6',
               }}>
-                <div style={{ fontWeight: 600, color: '#202923', marginBottom: 6 }}>Parking Rules</div>
-                <ul style={{ paddingLeft: 16 }}>
-                  <li>Arrive within 15 minutes of start time.</li>
-                  <li>Keep your QR pass available at entry.</li>
-                  <li>Do not park in other spots.</li>
-                  <li>Extend or cancel before the time expires.</li>
+                <div style={{ fontWeight: 700, color: '#174C3C', marginBottom: 8 }}>Campus Parking Guidelines</div>
+                <ul style={{ paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <li>Arrive within 15 minutes of selected start time.</li>
+                  <li>Have your digital QR pass ready at gate scan.</li>
+                  <li>Park strictly within your designated spot boundaries.</li>
+                  <li>Release or extend if leaving earlier or later.</li>
                 </ul>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginTop: 4 }}>
-                <input type="checkbox" defaultChecked id="terms" style={{ marginTop: 2 }} />
-                <label htmlFor="terms" style={{ fontSize: 12.5, color: '#68736B' }}>
-                  I agree to the campus parking rules and terms of use.
+                <input type="checkbox" defaultChecked id="terms" style={{ marginTop: 3, accentColor: '#174C3C' }} />
+                <label htmlFor="terms" style={{ fontSize: 12, color: '#68736B', lineHeight: 1.4 }}>
+                  I confirm that the vehicle details are accurate and agree to university parking policies.
                 </label>
               </div>
 
-              <div style={{ display: 'flex', gap: 8, marginTop: 'auto' }}>
-                <button className="btn-secondary" onClick={() => navigate('/bookings')}>
+              <div style={{ display: 'flex', gap: 10, marginTop: 'auto', paddingTop: 8 }}>
+                <button className="btn-secondary" style={{ borderRadius: 12, padding: '12px 16px' }} onClick={() => navigate('/bookings')}>
                   My Bookings
                 </button>
-                <button className="btn-primary" style={{ flex: 1 }} onClick={() => navigate('/bookings', { state: { showQR: confirmedBookingId } })}>
+                <button className="soft-btn-primary" style={{ flex: 1 }} onClick={() => navigate('/bookings', { state: { showQR: confirmedBookingId } })}>
                   View QR Pass →
                 </button>
               </div>
@@ -236,73 +240,71 @@ export default function ReserveParking() {
     );
   }
 
-  const step1Err = step === 2 ? validateStep1() : '';
-  if (step1Err) { /* ignore or use */ }
-
   return (
     <>
       <TopBar title="Reserve Parking" subtitle="Select a date, time and choose an available slot" />
       <div className="app-content">
         {/* Stepper */}
-        <div className="stepper" style={{ marginBottom: 24, maxWidth: 420 }}>
+        <div className="stepper" style={{ marginBottom: 22, maxWidth: 440 }}>
           {['Select Time', 'Choose Slot', 'Confirm Booking'].map((label, i) => {
             const n = (i + 1) as Step;
             const isDone = step > n;
             const isActive = step === n;
             return (
-              <>
-                <div key={n} className={`stepper-step${isActive ? ' active' : isDone ? ' done' : ''}`}>
+              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div className={`stepper-step${isActive ? ' active' : isDone ? ' done' : ''}`}>
                   <div className="step-num">{isDone ? '✓' : n}</div>
                   <span>{label}</span>
                 </div>
-                {i < 2 && <div className="step-divider" key={`d${i}`} />}
-              </>
+                {i < 2 && <div className="step-divider" />}
+              </div>
             );
           })}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: 16, alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '290px 1fr', gap: 18, alignItems: 'start' }}>
           {/* Left: date/time/area */}
-          <div className="ps-card" style={{ position: 'sticky', top: 0 }}>
-            <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 16 }}>1. Select Date & Time</div>
+          <div className="soft-card" style={{ padding: '22px', position: 'sticky', top: 0 }}>
+            <div style={{ fontWeight: 800, fontSize: 15, color: '#174C3C', marginBottom: 16 }}>1. Reservation Details</div>
 
-            <div className="form-group">
+            <div className="form-group" style={{ marginBottom: 14 }}>
               <label className="ps-label">Date</label>
               <input
                 type="date"
-                className="ps-input"
+                className="soft-input"
                 value={dateStr}
                 min={toLocalInput(new Date())}
                 onChange={e => setDateStr(e.target.value)}
               />
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{ marginBottom: 14 }}>
               <label className="ps-label">Start Time</label>
-              <input type="time" className="ps-input" value={startTime} onChange={e => setStartTime(e.target.value)} />
+              <input type="time" className="soft-input" value={startTime} onChange={e => setStartTime(e.target.value)} />
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{ marginBottom: 14 }}>
               <label className="ps-label">End Time</label>
-              <input type="time" className="ps-input" value={endTime} onChange={e => setEndTime(e.target.value)} />
+              <input type="time" className="soft-input" value={endTime} onChange={e => setEndTime(e.target.value)} />
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{ marginBottom: 14 }}>
               <label className="ps-label">Parking Area</label>
               <select
-                className="ps-input"
+                className="soft-input"
                 value={selectedArea?.id ?? ''}
                 onChange={e => {
                   const a = areas.find(x => x.id === e.target.value);
                   if (a) setSelectedArea(a);
                 }}
+                style={{ cursor: 'pointer' }}
               >
                 {areas.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
               </select>
             </div>
 
-            <div className="form-group">
-              <label className="ps-label">Vehicle Plate (optional)</label>
+            <div className="form-group" style={{ marginBottom: 18 }}>
+              <label className="ps-label">Vehicle Plate</label>
               <input
                 type="text"
-                className="ps-input"
+                className="soft-input"
                 placeholder="e.g. KA-01-AB-1234"
                 value={licensePlate}
                 onChange={e => setLicensePlate(e.target.value.toUpperCase())}
@@ -310,14 +312,13 @@ export default function ReserveParking() {
             </div>
 
             {error && (
-              <div style={{ color: '#B91C1C', fontSize: 12.5, marginBottom: 12, padding: '8px 10px', background: '#FCE2E2', borderRadius: 6 }}>
+              <div style={{ color: '#B91C1C', fontSize: 12.5, marginBottom: 14, padding: '10px 12px', background: '#FCE2E2', border: '1px solid #FECACA', borderRadius: 10 }}>
                 {error}
               </div>
             )}
 
             <button
-              className="btn-primary"
-              style={{ width: '100%' }}
+              className="soft-btn-primary"
               onClick={() => {
                 const e = validateStep1();
                 if (e) { setError(e); return; }
@@ -325,28 +326,31 @@ export default function ReserveParking() {
                 setStep(2);
               }}
             >
-              Check Availability <ChevronRight size={14} />
+              Check Availability <ChevronRight size={15} />
             </button>
           </div>
 
           {/* Right: slot grid */}
-          <div className="ps-card">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-              <span style={{ fontWeight: 700, fontSize: 14 }}>2. Choose an Available Slot</span>
+          <div className="soft-card" style={{ padding: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <div>
+                <span style={{ fontWeight: 800, fontSize: 15, color: '#174C3C' }}>2. Available Slot Matrix</span>
+                <p style={{ fontSize: 12, color: '#68736B', marginTop: 2 }}>Select any green slot to reserve your spot</p>
+              </div>
               <ParkingLegend />
             </div>
 
             {step === 1 ? (
-              <div className="empty-state" style={{ padding: 40 }}>
-                <p style={{ fontSize: 13, color: '#9CA3AF' }}>Select date, time and area, then check availability.</p>
+              <div className="empty-state" style={{ padding: 48, background: '#F9FBF9', borderRadius: 14, border: '1px dashed #D5DDD6' }}>
+                <p style={{ fontSize: 13, color: '#68736B' }}>Select date, time and parking area on the left, then click Check Availability.</p>
               </div>
             ) : loadingSlots ? (
-              <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
+              <div style={{ display: 'flex', justifyContent: 'center', padding: 56 }}>
                 <div className="spinner" />
               </div>
             ) : (
               <>
-                <div style={{ overflowX: 'auto', marginBottom: 16 }}>
+                <div style={{ overflowX: 'auto', marginBottom: 18, padding: '12px 6px', background: '#F8FAF8', borderRadius: 14, border: '1px solid #EAEFEA' }}>
                   <ParkingGrid
                     slots={slots}
                     selectedSlotId={selectedSlot?.id}
@@ -357,50 +361,55 @@ export default function ReserveParking() {
                 {/* Selected slot details */}
                 {selectedSlot ? (
                   <div style={{
-                    marginTop: 12, padding: '14px',
-                    border: '1px solid #C7F36B', borderRadius: 10, background: '#F7FBF8',
+                    marginTop: 14, padding: '18px 20px',
+                    border: '1.5px solid #C7F36B', borderRadius: 16, background: '#F7FBF8',
+                    boxShadow: '0 6px 16px rgba(23,76,60,0.06)',
                   }}>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: '#68736B', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 10 }}>
-                      Selected Slot
+                    <div style={{ fontSize: 11.5, fontWeight: 700, color: '#174C3C', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>
+                      Selected Slot Details
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
                       <div style={{
-                        width: 44, height: 44, borderRadius: 8, background: '#C7F36B',
+                        width: 46, height: 46, borderRadius: 12, background: '#C7F36B',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontWeight: 700, fontSize: 14, color: '#174C3C',
+                        fontWeight: 800, fontSize: 15, color: '#174C3C',
+                        boxShadow: '0 4px 10px rgba(199,243,107,0.4)',
                       }}>
                         {selectedSlot.slot_number}
                       </div>
                       <div>
-                        <div style={{ fontWeight: 600 }}>{selectedSlot.slot_number}</div>
-                        <div style={{ fontSize: 12, color: '#68736B' }}>{selectedArea?.name}</div>
+                        <div style={{ fontWeight: 700, fontSize: 14, color: '#174C3C' }}>Slot {selectedSlot.slot_number}</div>
+                        <div style={{ fontSize: 12, color: '#68736B' }}>{selectedArea?.name} · {selectedSlot.slot_type}</div>
                       </div>
-                      <StatusBadge status="AVAILABLE" />
+                      <div style={{ marginLeft: 'auto' }}>
+                        <StatusBadge status="AVAILABLE" />
+                      </div>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 14 }}>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 16, background: '#FFFFFF', padding: '10px 14px', borderRadius: 12, border: '1px solid #E5ECE6' }}>
                       {[
-                        { label: 'Standard Slot', sub: selectedSlot.slot_type },
-                        { label: 'Near Entrance', sub: '2 min walk' },
-                        { label: 'Covered', sub: 'Yes' },
+                        { label: 'Slot Type', sub: selectedSlot.slot_type },
+                        { label: 'Walking Distance', sub: '2 min walk' },
+                        { label: 'Facility', sub: 'Covered Bay' },
                       ].map(it => (
                         <div key={it.label} style={{ fontSize: 11, color: '#68736B', textAlign: 'center' }}>
-                          <div style={{ fontWeight: 600, color: '#202923', fontSize: 12 }}>{it.label}</div>
-                          <div>{it.sub}</div>
+                          <div style={{ fontWeight: 700, color: '#202923', fontSize: 12 }}>{it.sub}</div>
+                          <div>{it.label}</div>
                         </div>
                       ))}
                     </div>
+
                     <button
-                      className="btn-primary"
-                      style={{ width: '100%' }}
+                      className="soft-btn-primary"
                       onClick={handleConfirmBooking}
                       disabled={booking}
                     >
-                      {booking ? 'Booking…' : 'Proceed to Confirm →'}
+                      {booking ? 'Reserving Spot…' : 'Proceed to Confirm Booking →'}
                     </button>
                   </div>
                 ) : (
-                  <div style={{ fontSize: 13, color: '#9CA3AF', textAlign: 'center', padding: 12 }}>
-                    Click a green slot to select it.
+                  <div style={{ fontSize: 13, color: '#68736B', textAlign: 'center', padding: 14, background: '#F8FAF8', borderRadius: 12 }}>
+                    Click on an available green slot in the grid above to continue.
                   </div>
                 )}
               </>
@@ -411,3 +420,4 @@ export default function ReserveParking() {
     </>
   );
 }
+

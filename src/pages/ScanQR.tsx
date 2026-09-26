@@ -190,17 +190,16 @@ export default function ScanQR() {
     <>
       <TopBar title="Scan QR Pass" subtitle="Scan a QR pass or enter booking ID to validate" />
       <div className="app-content">
-        
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 16, alignItems: 'start', maxWidth: 960, margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 20, alignItems: 'start', maxWidth: 980, margin: '0 auto' }}>
           {/* Left: scanner or manual */}
-          <div className="ps-card">
+          <div className="soft-card" style={{ padding: '28px' }}>
             {/* Mode tabs */}
-            <div className="tab-bar" style={{ marginBottom: 20, maxWidth: 280 }}>
-              <button className={`tab-btn${mode === 'scan' ? ' active' : ''}`} onClick={() => setMode('scan')}>
-                <QrCode size={13} style={{ marginRight: 4 }} /> Scan QR
+            <div className="soft-tab-bar" style={{ marginBottom: 22, maxWidth: 300 }}>
+              <button className={`soft-tab-btn${mode === 'scan' ? ' active' : ''}`} onClick={() => setMode('scan')}>
+                <QrCode size={14} style={{ marginRight: 6, verticalAlign: 'middle' }} /> Camera Scan
               </button>
-              <button className={`tab-btn${mode === 'manual' ? ' active' : ''}`} onClick={() => setMode('manual')}>
-                <Keyboard size={13} style={{ marginRight: 4 }} /> Enter Booking ID
+              <button className={`soft-tab-btn${mode === 'manual' ? ' active' : ''}`} onClick={() => setMode('manual')}>
+                <Keyboard size={14} style={{ marginRight: 6, verticalAlign: 'middle' }} /> Manual Entry
               </button>
             </div>
 
@@ -208,12 +207,13 @@ export default function ScanQR() {
               <div style={{ textAlign: 'center' }}>
                 {/* Scanner frame */}
                 <div style={{
-                  width: 260, height: 260,
-                  background: '#1a1a2e',
-                  borderRadius: 12,
-                  margin: '0 auto 16px',
+                  width: 270, height: 270,
+                  background: '#0B2920',
+                  borderRadius: 20,
+                  margin: '0 auto 18px',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   position: 'relative', overflow: 'hidden',
+                  boxShadow: '0 12px 28px rgba(11, 41, 32, 0.35)',
                 }}>
                   {/* Corner marks */}
                   {[['0','0','top-left'], ['0','auto','bottom-left'], ['auto','0','top-right'], ['auto','auto','bottom-right']].map(([, , k]) => (
@@ -221,11 +221,11 @@ export default function ScanQR() {
                       position: 'absolute',
                       ...(k.includes('top') ? { top: 16 } : { bottom: 16 }),
                       ...(k.includes('left') ? { left: 16 } : { right: 16 }),
-                      width: 24, height: 24,
-                      borderColor: '#C7F36B', borderStyle: 'solid', borderRadius: 2,
-                      borderWidth: k.includes('top-left') ? '3px 0 0 3px' :
-                        k.includes('top-right') ? '3px 3px 0 0' :
-                        k.includes('bottom-left') ? '0 0 3px 3px' : '0 3px 3px 0',
+                      width: 26, height: 26,
+                      borderColor: '#C7F36B', borderStyle: 'solid', borderRadius: 4,
+                      borderWidth: k.includes('top-left') ? '3.5px 0 0 3.5px' :
+                        k.includes('top-right') ? '3.5px 3.5px 0 0' :
+                        k.includes('bottom-left') ? '0 0 3.5px 3.5px' : '0 3.5px 3.5px 0',
                     }} />
                   ))}
 
@@ -235,10 +235,18 @@ export default function ScanQR() {
                     style={{ width: '100%', height: '100%', display: cameraOn ? 'block' : 'none' }} 
                   />
                   {!cameraOn && (
-                    <div>
-                      <QrCode size={48} color="rgba(255,255,255,0.2)" />
-                      <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, marginTop: 10 }}>
-                        Position the QR code within the frame
+                    <div style={{ padding: 20 }}>
+                      <div style={{
+                        width: 56, height: 56, borderRadius: 16, background: 'rgba(199, 243, 107, 0.1)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px',
+                      }}>
+                        <QrCode size={30} color="#C7F36B" />
+                      </div>
+                      <div style={{ color: '#E8F4EF', fontSize: 13, fontWeight: 600 }}>
+                        Camera Standby
+                      </div>
+                      <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11.5, marginTop: 4 }}>
+                        Click below to launch scanner
                       </div>
                     </div>
                   )}
@@ -246,40 +254,42 @@ export default function ScanQR() {
 
                 <button
                   className="btn-secondary"
-                  style={{ gap: 6 }}
+                  style={{ gap: 8, padding: '11px 20px', borderRadius: 12, fontWeight: 600, fontSize: 13 }}
                   onClick={() => setCameraOn(prev => !prev)}
                 >
-                  {cameraOn ? '⏹ Stop Camera' : '📷 Turn on Camera'}
+                  {cameraOn ? '⏹ Turn Off Camera' : '📷 Activate Scanner Camera'}
                 </button>
 
-                <div style={{ margin: '16px 0', color: '#9CA3AF', fontSize: 12 }}>— or enter manually —</div>
+                <div style={{ margin: '20px 0 14px', color: '#68736B', fontSize: 12, fontWeight: 600 }}>
+                  — OR VALIDATE REFERENCE CODE —
+                </div>
 
-                <div style={{ display: 'flex', gap: 8 }}>
+                <div style={{ display: 'flex', gap: 10, maxWidth: 360, margin: '0 auto' }}>
                   <input
-                    className="ps-input"
+                    className="soft-input"
                     placeholder="e.g. PS-20241021-001"
                     value={inputCode}
                     onChange={e => setInputCode(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && handleValidate()}
                   />
-                  <button className="btn-primary" onClick={() => handleValidate()} disabled={loading}>
+                  <button className="soft-btn-primary" style={{ width: 'auto', padding: '10px 20px', fontSize: 13 }} onClick={() => handleValidate()} disabled={loading}>
                     {loading ? '…' : 'Validate'}
                   </button>
                 </div>
               </div>
             ) : (
               <div>
-                <label className="ps-label">Booking ID</label>
-                <div style={{ display: 'flex', gap: 8 }}>
+                <label className="ps-label" style={{ marginBottom: 8 }}>Booking Reference Code</label>
+                <div style={{ display: 'flex', gap: 10 }}>
                   <input
-                    className="ps-input"
+                    className="soft-input"
                     placeholder="e.g. PS-20241021-001"
                     value={inputCode}
                     onChange={e => setInputCode(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && handleValidate()}
                     autoFocus
                   />
-                  <button className="btn-primary" onClick={() => handleValidate()} disabled={loading}>
+                  <button className="soft-btn-primary" style={{ width: 'auto', padding: '10px 22px', fontSize: 13 }} onClick={() => handleValidate()} disabled={loading}>
                     {loading ? '…' : 'Validate'}
                   </button>
                 </div>
@@ -288,50 +298,52 @@ export default function ScanQR() {
           </div>
 
           {/* Right: booking details */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {error && (
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 10,
-                padding: '12px 14px', background: '#FCE2E2',
-                border: '1px solid #FCA5A5', borderRadius: 10,
+                padding: '13px 16px', background: '#FCE2E2',
+                border: '1px solid #FCA5A5', borderRadius: 14,
+                boxShadow: '0 4px 12px rgba(185, 28, 28, 0.08)',
               }}>
-                <XCircle size={16} color="#B91C1C" />
-                <span style={{ fontSize: 13, color: '#B91C1C', fontWeight: 500 }}>{error}</span>
+                <XCircle size={18} color="#B91C1C" />
+                <span style={{ fontSize: 13, color: '#B91C1C', fontWeight: 600 }}>{error}</span>
               </div>
             )}
 
             {success && (
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 10,
-                padding: '12px 14px', background: '#DDF5E5',
-                border: '1px solid #A7E8BC', borderRadius: 10,
+                padding: '13px 16px', background: '#DDF5E5',
+                border: '1px solid #A7E8BC', borderRadius: 14,
+                boxShadow: '0 4px 12px rgba(6, 95, 70, 0.08)',
               }}>
-                <CheckCircle size={16} color="#065F46" />
-                <span style={{ fontSize: 13, color: '#065F46', fontWeight: 500 }}>{success}</span>
+                <CheckCircle size={18} color="#065F46" />
+                <span style={{ fontSize: 13, color: '#065F46', fontWeight: 600 }}>{success}</span>
               </div>
             )}
 
             {booking && (
-              <div className="ps-card">
-                <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div className="soft-card" style={{ padding: '22px' }}>
+                <div style={{ fontWeight: 800, fontSize: 14, color: '#174C3C', marginBottom: 14, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   Booking Details
                   <StatusBadge status={booking.status} />
                 </div>
 
                 <div style={{
-                  display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14,
-                  padding: '10px 12px', background: '#F7FBF8', borderRadius: 8,
+                  display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16,
+                  padding: '12px 14px', background: '#F7FBF8', borderRadius: 12, border: '1px solid #E5EAE4',
                 }}>
                   <div style={{
-                    width: 38, height: 38, borderRadius: 8,
+                    width: 44, height: 44, borderRadius: 10,
                     background: '#DDF5E5', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontWeight: 700, fontSize: 12, color: '#065F46',
+                    fontWeight: 800, fontSize: 14, color: '#065F46',
                   }}>
                     {booking.parking_slots?.slot_number ?? '—'}
                   </div>
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: 13 }}>{booking.parking_slots?.slot_number ?? 'Assigned Slot'}</div>
-                    <div style={{ fontSize: 11.5, color: '#68736B' }}>{booking.parking_slots?.parking_areas?.name ?? 'Campus Lot'}</div>
+                    <div style={{ fontWeight: 700, fontSize: 14, color: '#174C3C' }}>Slot {booking.parking_slots?.slot_number ?? 'Assigned Slot'}</div>
+                    <div style={{ fontSize: 12, color: '#68736B' }}>{booking.parking_slots?.parking_areas?.name ?? 'Campus Lot'}</div>
                   </div>
                 </div>
 
@@ -343,25 +355,25 @@ export default function ScanQR() {
                   { label: 'Vehicle Plate', value: booking.license_plate && booking.license_plate !== 'N/A' ? booking.license_plate : 'N/A' },
                 ].map(r => (
                   <div key={r.label} style={{
-                    display: 'flex', padding: '7px 0', borderBottom: '1px solid #F0F2EF', fontSize: 12.5,
+                    display: 'flex', padding: '9px 0', borderBottom: '1px solid #F0F4F1', fontSize: 12.5,
                   }}>
-                    <span style={{ color: '#68736B', width: 90 }}>{r.label}</span>
-                    <span style={{ fontWeight: 500, fontFamily: r.label === 'Booking ID' ? 'monospace' : undefined }}>{r.value}</span>
+                    <span style={{ color: '#68736B', width: 95, fontWeight: 500 }}>{r.label}</span>
+                    <span style={{ fontWeight: 600, color: '#202923', fontFamily: r.label === 'Booking ID' ? 'monospace' : undefined }}>{r.value}</span>
                   </div>
                 ))}
 
-                <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+                <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
                   <button
-                    className="btn-primary"
-                    style={{ flex: 1 }}
+                    className="soft-btn-primary"
+                    style={{ flex: 1, padding: '11px 16px', fontSize: 13 }}
                     disabled={booking.status !== 'CONFIRMED' || actionLoading}
                     onClick={handleCheckin}
                   >
-                    {actionLoading ? '…' : 'Check In'}
+                    {actionLoading ? '…' : 'Confirm Check In'}
                   </button>
                   <button
                     className="btn-secondary"
-                    style={{ flex: 1 }}
+                    style={{ flex: 1, padding: '11px 16px', borderRadius: 14, fontSize: 13, fontWeight: 700 }}
                     disabled={booking.status !== 'CHECKED_IN' || actionLoading}
                     onClick={handleCheckout}
                   >
@@ -369,24 +381,26 @@ export default function ScanQR() {
                   </button>
                 </div>
 
-                <button className="btn-secondary" style={{ width: '100%', marginTop: 8, fontSize: 12 }} onClick={reset}>
-                  Scan Another
+                <button className="btn-secondary" style={{ width: '100%', marginTop: 10, fontSize: 12.5, borderRadius: 10 }} onClick={reset}>
+                  Scan Another Code
                 </button>
               </div>
             )}
 
             {loading && (
-              <div className="ps-card" style={{ textAlign: 'center', padding: '32px 20px' }}>
-                <div style={{ fontSize: 13, color: '#68736B', fontWeight: 500 }}>Loading booking details...</div>
+              <div className="soft-card" style={{ textAlign: 'center', padding: '36px 20px' }}>
+                <div style={{ fontSize: 13, color: '#174C3C', fontWeight: 600 }}>Validating pass data with Supabase…</div>
               </div>
             )}
 
             {!booking && !error && !success && !loading && (
-              <div className="ps-card" style={{ textAlign: 'center', padding: '32px 20px' }}>
-                <QrCode size={32} color="#C9CFC8" style={{ marginBottom: 8 }} />
-                <div style={{ fontSize: 13, color: '#68736B', fontWeight: 500 }}>Booking Details</div>
-                <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 4 }}>
-                  Scan a QR code or enter a booking ID to view details.
+              <div className="soft-card" style={{ textAlign: 'center', padding: '36px 20px' }}>
+                <div style={{ width: 48, height: 48, borderRadius: 14, background: '#EDF2EE', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 10px' }}>
+                  <QrCode size={24} color="#174C3C" />
+                </div>
+                <div style={{ fontSize: 14, color: '#174C3C', fontWeight: 700 }}>Pass Status Standby</div>
+                <p style={{ fontSize: 12, color: '#68736B', marginTop: 4 }}>
+                  Scan a QR pass or type the booking code to inspect slot and user details.
                 </p>
               </div>
             )}
@@ -396,3 +410,4 @@ export default function ScanQR() {
     </>
   );
 }
+

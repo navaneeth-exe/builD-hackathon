@@ -596,3 +596,126 @@ body {
   .nav-item { justify-content: center; padding: 12px; }
   .app-content { padding: 16px; }
 }
+
+/* =========================================
+   Soft Tactile Realism (Clean & Polished)
+   ========================================= */
+
+/* Soft Card with organic elevation */
+.soft-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8E3;
+  border-radius: 20px;
+  box-shadow:
+    0 10px 25px -5px rgba(23, 76, 60, 0.08),
+    0 8px 10px -6px rgba(0, 0, 0, 0.03);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.soft-card:hover {
+  box-shadow:
+    0 16px 32px -6px rgba(23, 76, 60, 0.12),
+    0 8px 12px -6px rgba(0, 0, 0, 0.04);
+}
+
+/* Soft Tactile Tab Switcher */
+.soft-tab-bar {
+  background: #EDF2EE;
+  border-radius: 14px;
+  padding: 5px;
+  display: flex;
+  gap: 4px;
+}
+
+.soft-tab-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #5C7063;
+  background: transparent;
+}
+
+.soft-tab-btn.active {
+  background: #FFFFFF;
+  color: #174C3C;
+  box-shadow: 0 4px 12px rgba(23, 76, 60, 0.1);
+}
+
+/* Soft Tactile Inputs */
+.soft-input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #F8FAF8;
+  border: 1.5px solid #E2E8E3;
+  color: #202923;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.soft-input:focus {
+  background: #FFFFFF;
+  border-color: #174C3C;
+  box-shadow: 0 0 0 3px rgba(23, 76, 60, 0.12);
+}
+
+/* Soft Tactile Button */
+.soft-btn-primary {
+  width: 100%;
+  padding: 13px 20px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 14.5px;
+  border: none;
+  cursor: pointer;
+  background: #174C3C;
+  color: #C7F36B;
+  box-shadow: 0 8px 18px rgba(23, 76, 60, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.soft-btn-primary:hover:not(:disabled) {
+  background: #1E5E4A;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(23, 76, 60, 0.32);
+}
+
+.soft-btn-primary:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: 0 4px 10px rgba(23, 76, 60, 0.2);
+}
+
+.soft-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Soft Stat Card */
+.soft-stat-card {
+  background: #FFFFFF;
+  border: 1px solid #E5ECE6;
+  border-radius: 16px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 4px 16px rgba(23, 76, 60, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.soft-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(23, 76, 60, 0.09);
+}
+
+

@@ -88,26 +88,39 @@ export default function LiveParking() {
       <TopBar title="Live Parking" subtitle="Monitor real-time slot occupancy and reservations" />
       <div className="app-content">
         {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}><Loader2 className="spinner" /></div>
+          <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}><Loader2 className="spinner" /></div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: 16 }}>
             {slots.map(slot => {
               const { status, color, text, booking } = getSlotStatus(slot);
               return (
-                <div key={slot.id} className="ps-card" style={{ padding: 16, background: color, borderColor: 'rgba(0,0,0,0.06)', textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div
+                  key={slot.id}
+                  className="soft-card"
+                  style={{
+                    padding: '18px 16px',
+                    background: color,
+                    borderColor: 'rgba(0,0,0,0.06)',
+                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    minHeight: 140,
+                  }}
+                >
                   <div>
-                    <div style={{ fontSize: 20, fontWeight: 800, color: text }}>{slot.slot_number}</div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: text, opacity: 0.9, marginTop: 4, letterSpacing: '0.04em' }}>{status}</div>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: text }}>{slot.slot_number}</div>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: text, opacity: 0.9, marginTop: 4, letterSpacing: '0.04em' }}>{status}</div>
                   </div>
                   {booking && (
-                    <div style={{ marginTop: 10, fontSize: 11, fontWeight: 600, color: text, background: 'rgba(255,255,255,0.65)', padding: '6px 8px', borderRadius: 6 }}>
+                    <div style={{ marginTop: 12, fontSize: 11, fontWeight: 600, color: text, background: 'rgba(255,255,255,0.7)', padding: '8px 10px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.8)' }}>
                       {booking.license_plate && booking.license_plate !== 'N/A' && (
-                        <div style={{ fontWeight: 700, marginBottom: 2 }}>{booking.license_plate}</div>
+                        <div style={{ fontWeight: 800, marginBottom: 2, fontFamily: 'monospace' }}>{booking.license_plate}</div>
                       )}
-                      <div style={{ fontSize: 10, opacity: 0.85 }}>
+                      <div style={{ fontSize: 10.5, opacity: 0.85 }}>
                         {formatTime(booking.start_time)} – {formatTime(booking.end_time)}
                       </div>
-                      <div style={{ fontSize: 9.5, opacity: 0.75, marginTop: 2 }}>
+                      <div style={{ fontSize: 10, opacity: 0.75, marginTop: 2, fontWeight: 500 }}>
                         {booking.user_name}
                       </div>
                     </div>
@@ -117,6 +130,7 @@ export default function LiveParking() {
             })}
           </div>
         )}
+
       </div>
     </>
   );

@@ -14,7 +14,7 @@ export default function StatCard({
   label, value, icon, accent = '#E8F4EF', iconColor = '#174C3C', suffix, pct
 }: StatCardProps) {
   return (
-    <div className="stat-card">
+    <div className="stat-card soft-stat-card">
       <div style={{
         width: 40, height: 40, borderRadius: 10,
         background: accent,

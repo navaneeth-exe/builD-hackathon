@@ -121,38 +121,38 @@ export default function AdminDashboard() {
       {/* Add Slot Modal */}
       {showAddSlot && (
         <div className="modal-backdrop">
-          <div className="modal-box">
+          <div className="modal-box soft-card" style={{ padding: '28px', maxWidth: 440 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-              <span style={{ fontWeight: 700, fontSize: 15 }}>Add Parking Slot</span>
+              <span style={{ fontWeight: 800, fontSize: 16, color: '#174C3C' }}>Add Parking Slot</span>
               <button onClick={() => setShowAddSlot(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#68736B' }}>
-                <X size={16} />
+                <X size={18} />
               </button>
             </div>
 
-            <div className="form-group">
+            <div className="form-group" style={{ marginBottom: 14 }}>
               <label className="ps-label">Parking Area</label>
-              <select className="ps-input" value={newSlotArea} onChange={e => setNewSlotArea(e.target.value)}>
+              <select className="soft-input" value={newSlotArea} onChange={e => setNewSlotArea(e.target.value)}>
                 {areas.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
               </select>
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{ marginBottom: 14 }}>
               <label className="ps-label">Slot Number (e.g. A-15)</label>
-              <input className="ps-input" placeholder="A-15" value={newSlotNumber} onChange={e => setNewSlotNumber(e.target.value)} />
+              <input className="soft-input" placeholder="A-15" value={newSlotNumber} onChange={e => setNewSlotNumber(e.target.value)} />
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{ marginBottom: 18 }}>
               <label className="ps-label">Slot Type</label>
-              <select className="ps-input" value={newSlotType} onChange={e => setNewSlotType(e.target.value)}>
+              <select className="soft-input" value={newSlotType} onChange={e => setNewSlotType(e.target.value)}>
                 <option>Car</option>
                 <option>Bike</option>
                 <option>EV</option>
               </select>
             </div>
 
-            {addSlotError && <div style={{ color: '#B91C1C', fontSize: 12.5, marginBottom: 10 }}>{addSlotError}</div>}
+            {addSlotError && <div style={{ color: '#B91C1C', fontSize: 12.5, marginBottom: 12, padding: '8px 12px', background: '#FCE2E2', borderRadius: 8 }}>{addSlotError}</div>}
 
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button className="btn-secondary" style={{ flex: 1 }} onClick={() => setShowAddSlot(false)}>Cancel</button>
-              <button className="btn-primary" style={{ flex: 1 }} onClick={handleAddSlot} disabled={addingSlot}>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button className="btn-secondary" style={{ flex: 1, borderRadius: 12 }} onClick={() => setShowAddSlot(false)}>Cancel</button>
+              <button className="soft-btn-primary" style={{ flex: 1 }} onClick={handleAddSlot} disabled={addingSlot}>
                 {addingSlot ? 'Adding…' : 'Add Slot'}
               </button>
             </div>
@@ -162,7 +162,7 @@ export default function AdminDashboard() {
 
       <div className="app-content" style={{ display: 'flex', gap: 0, padding: 0, height: '100%', overflow: 'hidden' }}>
         {/* Admin sidebar */}
-        <div className="admin-sidebar">
+        <div className="admin-sidebar" style={{ background: '#113E31' }}>
           {TABS.map(t => (
             <div
               key={t.id}
@@ -182,16 +182,16 @@ export default function AdminDashboard() {
             <div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
                 <StatCard label="Total Slots" value={stats.total} icon={<ParkingSquare size={18} />} accent="#E8F4EF" iconColor="#174C3C" />
-                <StatCard label="Available" value={stats.available} icon={<span style={{ fontWeight: 700 }}>✓</span>} accent="#DDF5E5" iconColor="#065F46" />
-                <StatCard label="Reserved" value={stats.reserved} icon={<span style={{ fontWeight: 700 }}>⏱</span>} accent="#FEF0C7" iconColor="#92400E" />
-                <StatCard label="Occupied" value={stats.occupied} icon={<span style={{ fontWeight: 700 }}>🚗</span>} accent="#FCE2E2" iconColor="#B91C1C" />
+                <StatCard label="Available" value={stats.available} icon={<span style={{ fontWeight: 800 }}>✓</span>} accent="#DDF5E5" iconColor="#065F46" />
+                <StatCard label="Reserved" value={stats.reserved} icon={<span style={{ fontWeight: 800 }}>⏱</span>} accent="#FEF0C7" iconColor="#92400E" />
+                <StatCard label="Occupied" value={stats.occupied} icon={<span style={{ fontWeight: 800 }}>🚗</span>} accent="#FCE2E2" iconColor="#B91C1C" />
               </div>
 
               {/* Recent reservations */}
-              <div className="ps-card" style={{ padding: 0, overflow: 'hidden' }}>
-                <div style={{ padding: '16px 20px', borderBottom: '1px solid #E5EAE4', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontWeight: 700, fontSize: 14 }}>Recent Reservations</span>
-                  <button className="btn-secondary" style={{ fontSize: 12, padding: '6px 12px' }} onClick={() => setTab('reservations')}>
+              <div className="soft-card" style={{ padding: 0, overflow: 'hidden' }}>
+                <div style={{ padding: '16px 22px', borderBottom: '1.5px solid #E5EAE4', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontWeight: 800, fontSize: 14, color: '#174C3C' }}>Recent Reservations</span>
+                  <button className="btn-secondary" style={{ fontSize: 12, padding: '6px 14px', borderRadius: 8 }} onClick={() => setTab('reservations')}>
                     View All
                   </button>
                 </div>
@@ -207,8 +207,8 @@ export default function AdminDashboard() {
                   <tbody>
                     {bookings.slice(0, 6).map(b => (
                       <tr key={b.id}>
-                        <td style={{ fontWeight: 600 }}>{b.parking_slots?.slot_number}</td>
-                        <td>{b.user_name}</td>
+                        <td style={{ fontWeight: 700, color: '#174C3C' }}>{b.parking_slots?.slot_number}</td>
+                        <td style={{ fontWeight: 500 }}>{b.user_name}</td>
                         <td style={{ color: '#68736B' }}>
                           {formatDate(b.start_time)}, {formatTime(b.start_time)} – {formatTime(b.end_time)}
                         </td>
@@ -223,22 +223,23 @@ export default function AdminDashboard() {
               </div>
 
               {/* Quick actions */}
-              <div style={{ marginTop: 16, display: 'flex', gap: 10 }}>
-                <button className="btn-primary" onClick={() => { setShowAddSlot(true); setTab('slots'); }}>
-                  <Plus size={14} /> Add Parking Slot
+              <div style={{ marginTop: 20, display: 'flex', gap: 10 }}>
+                <button className="soft-btn-primary" style={{ width: 'auto', padding: '10px 18px', fontSize: 13 }} onClick={() => { setShowAddSlot(true); setTab('slots'); }}>
+                  <Plus size={15} /> Add Parking Slot
                 </button>
-                <button className="btn-secondary" onClick={() => setTab('slots')}>
+                <button className="btn-secondary" style={{ borderRadius: 12 }} onClick={() => setTab('slots')}>
                   Manage Slots
                 </button>
-                <button className="btn-secondary" onClick={() => setTab('reservations')}>
+                <button className="btn-secondary" style={{ borderRadius: 12 }} onClick={() => setTab('reservations')}>
                   View Reservations
                 </button>
-                <button className="btn-secondary" onClick={() => setTab('scan')}>
-                  Scan QR
+                <button className="btn-secondary" style={{ borderRadius: 12 }} onClick={() => setTab('scan')}>
+                  Scan QR Pass
                 </button>
               </div>
             </div>
           )}
+
 
           {/* Slots management */}
           {tab === 'slots' && (
