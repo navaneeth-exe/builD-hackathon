@@ -123,7 +123,7 @@ export default function Overview() {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {recentBookings.map(b => (
-                  <div key={b.id} style={{ 
+                  <div key={b.id} className="gk-list-item" style={{ 
                       display: 'flex', alignItems: 'center', gap: 16, 
                       padding: '16px 20px', background: '#F8FAF7', borderRadius: 16,
                       border: '1px solid #EAEFEA', transition: 'background 0.2s',
@@ -135,7 +135,7 @@ export default function Overview() {
                       </div>
                       
                       {/* Details */}
-                      <div style={{ flex: 1, minWidth: 0, display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 16, alignItems: 'center' }}>
+                      <div className="gk-list-grid" style={{ flex: 1, minWidth: 0, display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 16, alignItems: 'center' }}>
                           <div>
                               <div style={{ fontSize: 14, fontWeight: 700, color: '#1A2420', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{b.user_name}</div>
                               <div style={{ fontSize: 12, color: '#627068', marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>

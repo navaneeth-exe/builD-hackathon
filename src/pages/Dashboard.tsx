@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ParkingSquare, Car, Zap, MapPin, Clock, ArrowRight, Activity, Calendar } from 'lucide-react';
+import { ParkingSquare, Car, Zap, MapPin, Clock, ArrowRight, Activity, Calendar, Sparkles } from 'lucide-react';
 import TopBar from '../components/TopBar';
 import StatCard from '../components/StatCard';
 import ParkingGrid, { ParkingLegend } from '../components/ParkingGrid';
@@ -89,29 +89,32 @@ export default function Dashboard() {
     <>
       <TopBar title="Overview" subtitle="Smart Campus Parking" />
 
-      <div className="app-content" style={{ padding: '36px 40px', maxWidth: 1600, margin: '0 auto' }}>
+      <div className="app-content" style={{ maxWidth: 1600, margin: '0 auto' }}>
         
         {/* Main Grid Layout matching the poster reference */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 32, alignItems: 'start' }}>
+        <div className="dashboard-grid">
            
            {/* LEFT COLUMN: Hero + Map + Bottom Cards */}
-           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+           <div style={{ display: 'flex', flexDirection: 'column', gap: 24, minWidth: 0 }}>
               
               {/* Hero Greeting */}
               <div style={{ padding: '8px 0 16px 0', position: 'relative' }}>
-                 <h1 style={{ 
-                     fontSize: 42, fontWeight: 800, color: '#174C3C', 
+                 <h1 className="dashboard-hero-h1" style={{ 
+                     fontWeight: 800, color: '#174C3C', 
                      letterSpacing: '-0.03em', lineHeight: 1.1, margin: 0
                  }}>
                    {greeting},<br/>
                    <span style={{ color: '#1A2420' }}>{profile?.full_name?.split(' ')[0] || 'User'}!</span> 
                    <span style={{ 
-                       display: 'inline-block', marginLeft: 12, 
-                       animation: 'wave 2.5s infinite transform-origin: 70% 70%',
-                       transformOrigin: '70% 70%' 
-                   }}>👋</span>
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        marginLeft: 12, width: 34, height: 34, borderRadius: 10,
+                        background: 'rgba(199, 243, 107, 0.25)', border: '1px solid rgba(199, 243, 107, 0.4)',
+                        verticalAlign: 'middle'
+                    }}>
+                      <Sparkles size={18} color="#174C3C" />
+                    </span>
                  </h1>
-                 <p style={{ fontSize: 16, color: '#627068', marginTop: 12, fontWeight: 500, maxWidth: 400 }}>
+                 <p style={{ fontSize: 15, color: '#627068', marginTop: 12, fontWeight: 500, maxWidth: 400 }}>
                    Find the best parking spot before you arrive and skip the campus traffic.
                  </p>
                  <style>{`
@@ -128,17 +131,22 @@ export default function Dashboard() {
                  `}</style>
               </div>
 
-              {/* Immersive Map Container (3D soft realism) */}
+              {/* Immersive Campus Map + Parking Facility */}
               <div className="soft-card map-container" style={{ 
                   position: 'relative', overflow: 'hidden', padding: 0, 
-                  borderRadius: 32, minHeight: 520,
-                  backgroundImage: 'radial-gradient(circle at center, rgba(250, 248, 242, 0.2) 0%, rgba(250, 248, 242, 0.85) 100%), url(/campus-bg.jpg)',
+                  borderRadius: 32, minHeight: 540,
+                  backgroundImage: 'url(/campus-bg.jpg)',
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
-                  boxShadow: '0 24px 48px rgba(23,76,60,0.08), inset 0 2px 8px rgba(255,255,255,0.9)',
+                  boxShadow: '0 24px 48px rgba(23,76,60,0.10), inset 0 2px 8px rgba(255,255,255,0.7)',
                   display: 'flex', flexDirection: 'column'
               }}>
-                  {/* Floating Action Bar inside map area */}
+                  {/* Subtle overlay for contrast */}
+                  <div style={{
+                      position: 'absolute', inset: 0,
+                      background: 'linear-gradient(180deg, rgba(250,248,242,0.15) 0%, rgba(250,248,242,0.35) 100%)',
+                      pointerEvents: 'none', zIndex: 1,
+                  }} />
                   <div style={{
                       position: 'absolute', top: 24, left: 24, zIndex: 10,
                       background: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(16px)',
@@ -192,9 +200,9 @@ export default function Dashboard() {
                       </div>
                   </div>
 
-                  {/* Pseudo-3D Isometric Grid Wrapper */}
+                  {/* Parking Facility Surface */}
                   <div style={{ 
-                      flex: 1, padding: '120px 40px 40px 40px', 
+                      flex: 1, padding: '90px 32px 32px 32px', 
                       display: 'flex', justifyContent: 'center', alignItems: 'center',
                       position: 'relative', zIndex: 5
                   }}>
@@ -204,32 +212,65 @@ export default function Dashboard() {
                         <div className="empty-state">No slots found</div>
                      ) : (
                         <div style={{
-                            padding: 36, background: 'rgba(255, 255, 255, 0.95)', borderRadius: 32,
-                            boxShadow: '0 32px 64px rgba(23,76,60,0.12), 0 4px 16px rgba(0,0,0,0.04), inset 0 2px 4px rgba(255,255,255,1)',
-                            backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
-                            border: '1px solid rgba(255,255,255,0.6)',
-                            transform: 'rotateX(18deg) rotateZ(-2deg) translateY(-10px)', 
-                            transformOrigin: 'center', transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                            cursor: 'grab'
-                        }}
-                        onMouseEnter={(e) => { e.currentTarget.style.transform = 'rotateX(0deg) rotateZ(0deg) translateY(0)'; e.currentTarget.style.boxShadow = '0 16px 40px rgba(23,76,60,0.08), inset 0 2px 4px rgba(255,255,255,1)'; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.transform = 'rotateX(18deg) rotateZ(-2deg) translateY(-10px)'; e.currentTarget.style.boxShadow = '0 32px 64px rgba(23,76,60,0.12), 0 4px 16px rgba(0,0,0,0.04), inset 0 2px 4px rgba(255,255,255,1)'; }}
-                        >
-                            <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'center' }}>
+                            padding: '24px 28px 20px',
+                            background: 'rgba(250, 248, 242, 0.75)',
+                            backdropFilter: 'blur(20px)',
+                            WebkitBackdropFilter: 'blur(20px)',
+                            borderRadius: 24,
+                            border: '1px solid rgba(220, 228, 220, 0.6)',
+                            boxShadow: '0 24px 48px rgba(23,76,60,0.12), 0 2px 8px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,1)',
+                            transform: 'translateZ(0)', /* Fixes webkit white flash bug */
+                        }}>
+                            {/* Facility header */}
+                            <div style={{ 
+                                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                marginBottom: 18,
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <div style={{
+                                        width: 5, height: 22, borderRadius: 3,
+                                        background: 'linear-gradient(to bottom, #C7F36B, #174C3C)',
+                                    }} />
+                                    <div>
+                                        <div style={{ fontSize: 11, fontWeight: 800, color: '#174C3C', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Parking Facility</div>
+                                        <div style={{ fontSize: 10, color: '#627068', fontWeight: 500, marginTop: 1 }}>{selectedArea?.name}</div>
+                                    </div>
+                                </div>
                                 <ParkingLegend />
                             </div>
-                            <ParkingGrid 
-                                slots={slots} 
-                                selectedSlotId={selectedSlot?.id} 
-                                onSlotClick={s => setSelectedSlot(prev => prev?.id === s.id ? null : s)} 
-                            />
+
+                            {/* Asphalt surface */}
+                            <div className="parking-map-scroll">
+                                <div className="parking-map-inner">
+                                    <div style={{
+                                        background: 'linear-gradient(160deg, #ECECE8 0%, #E4E4DF 100%)',
+                                        borderRadius: 16,
+                                        padding: '18px 14px',
+                                        border: '1px solid rgba(180,180,170,0.4)',
+                                        boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.06), inset 0 -1px 3px rgba(255,255,255,0.5)',
+                                        position: 'relative', overflow: 'hidden',
+                                    }}>
+                                        {/* Subtle asphalt texture */}
+                                        <div style={{
+                                            position: 'absolute', inset: 0, pointerEvents: 'none',
+                                            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 18px, rgba(160,160,150,0.08) 18px, rgba(160,160,150,0.08) 19px)',
+                                            borderRadius: 16,
+                                        }} />
+                                        <ParkingGrid 
+                                            slots={slots} 
+                                            selectedSlotId={selectedSlot?.id} 
+                                            onSlotClick={s => setSelectedSlot(prev => prev?.id === s.id ? null : s)} 
+                                        />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                      )}
                   </div>
               </div>
 
               {/* Bottom Quick widgets */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+              <div className="dashboard-bottom-grid">
                   <div className="soft-card" style={{ padding: '24px 28px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                           <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1A2420', display: 'flex', alignItems: 'center', gap: 10, margin: 0 }}>
@@ -265,8 +306,8 @@ export default function Dashboard() {
                                       <div style={{ fontSize: 15, fontWeight: 700, color: '#1A2420' }}>{selectedSlot.slot_type}</div>
                                       <div style={{ fontSize: 13, color: '#627068', marginTop: 2 }}>{selectedArea?.name}</div>
                                   </div>
-                                  <button className="btn-primary" style={{ padding: '12px 20px', borderRadius: 12, background: '#174C3C' }} onClick={() => navigate('/reserve', { state: { slot: selectedSlot, area: selectedArea } })}>
-                                      Reserve →
+                                  <button className="btn-primary" style={{ padding: '12px 20px', borderRadius: 12, background: '#174C3C', display: 'inline-flex', alignItems: 'center', gap: 6 }} onClick={() => navigate('/reserve', { state: { slot: selectedSlot, area: selectedArea } })}>
+                                      Reserve <ArrowRight size={16} />
                                   </button>
                               </div>
                           </div>
@@ -289,7 +330,7 @@ export default function Dashboard() {
            </div>
 
            {/* RIGHT COLUMN: AI & Stats */}
-           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+           <div style={{ display: 'flex', flexDirection: 'column', gap: 24, minWidth: 0 }}>
                
                {/* AI Recommendation Card (Hero styling from poster) */}
                <div className="soft-card" style={{ padding: 24, background: '#FFFFFF' }}>
@@ -360,7 +401,7 @@ export default function Dashboard() {
                </div>
 
                {/* Stats Grid */}
-               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+               <div className="stats-grid">
                    <StatCard label="Available" value={stats.available} icon={<Car size={18} />} accent="#D9F2E4" iconColor="#065F46" pct={stats.total ? `${Math.round((stats.available / stats.total) * 100)}%` : undefined} />
                    <StatCard label="Occupied" value={stats.occupied} icon={<ParkingSquare size={18} />} accent="#FCE4E4" iconColor="#B91C1C" pct={stats.total ? `${Math.round((stats.occupied / stats.total) * 100)}%` : undefined} />
                </div>

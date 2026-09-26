@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { QrCode, Keyboard, CheckCircle, XCircle, Search, ShieldCheck } from 'lucide-react';
+import { QrCode, Keyboard, CheckCircle, XCircle, Search, ShieldCheck, Camera, CameraOff } from 'lucide-react';
 import TopBar from '../components/TopBar';
 import StatusBadge from '../components/StatusBadge';
 import { fetchBookingByCode, updateBookingStatus } from '../api';
@@ -150,7 +150,7 @@ export default function ScanQR() {
     setActionLoading(true);
     try {
       await updateBookingStatus(booking.id, 'CHECKED_IN');
-      setSuccess('✅ Vehicle Checked In Successfully');
+      setSuccess('Vehicle Checked In Successfully');
       setBooking({ ...booking, status: 'CHECKED_IN' });
     } catch (e: any) {
       setError(e.message ?? 'Check-in failed.');
@@ -166,7 +166,7 @@ export default function ScanQR() {
     setActionLoading(true);
     try {
       await updateBookingStatus(booking.id, 'COMPLETED');
-      setSuccess('✅ Vehicle Checked Out Successfully');
+      setSuccess('Vehicle Checked Out Successfully');
       setBooking({ ...booking, status: 'COMPLETED' });
     } catch (e: any) {
       setError(e.message ?? 'Check-out failed.');
@@ -187,7 +187,7 @@ export default function ScanQR() {
     <>
       <TopBar title="Pass Validation" subtitle="Scan digital QR passes or enter IDs manually" />
       <div className="app-content">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: 24, alignItems: 'start', maxWidth: 1040, margin: '0 auto', padding: '16px' }}>
+        <div className="scan-grid" style={{ alignItems: 'start', maxWidth: 1040, margin: '0 auto' }}>
           
           {/* Left: scanner or manual */}
           <div className="soft-card" style={{ padding: '32px', borderRadius: 28, display: 'flex', flexDirection: 'column', height: '100%', minHeight: 520, background: '#FFFFFF', boxShadow: '0 24px 48px rgba(23,76,60,0.04)' }}>
@@ -213,7 +213,9 @@ export default function ScanQR() {
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 {/* Scanner frame */}
                 <div style={{
-                  width: 320, height: 320,
+                  width: '100%',
+                  maxWidth: 320,
+                  aspectRatio: '1/1',
                   background: '#0B1510',
                   borderRadius: 32,
                   margin: '0 auto 24px',
@@ -267,7 +269,15 @@ export default function ScanQR() {
                   style={{ gap: 10, padding: '14px 28px', borderRadius: 16, fontWeight: 700, fontSize: 14, boxShadow: '0 12px 24px rgba(23,76,60,0.15)' }}
                   onClick={() => setCameraOn(prev => !prev)}
                 >
-                  {cameraOn ? '⏹ Turn Off Camera' : '📷 Activate Scanner'}
+                  {cameraOn ? (
+                    <>
+                      <CameraOff size={18} /> Turn Off Camera
+                    </>
+                  ) : (
+                    <>
+                      <Camera size={18} /> Activate Scanner
+                    </>
+                  )}
                 </button>
               </div>
             ) : (

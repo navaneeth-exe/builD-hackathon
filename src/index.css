@@ -126,6 +126,7 @@ body {
 .app-layout {
   display: flex;
   height: 100%;
+  /* Do NOT set overflow:hidden here — it breaks mobile scroll */
   overflow: hidden;
 }
 
@@ -147,8 +148,9 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: hidden;  /* clip topbar, let .app-content scroll */
   background: #FAF8F2;
+  min-width: 0; /* prevents flex child overflow */
 }
 
 .app-topbar {
@@ -168,6 +170,7 @@ body {
 .app-content {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden; /* prevent horizontal scroll on the page level */
   padding: 28px;
 }
 
@@ -1084,26 +1087,438 @@ body {
   letter-spacing: 0;
 }
 
+
 /* =========================================
-   Responsive
+   Responsive Design System
+   =========================================
+   Strategy:
+   - Desktop-first for the sidebar layout
+   - Mobile: sidebar becomes a bottom nav bar
+   - All layout grids use minmax(0,1fr) to prevent overflow
+   - No overflow:hidden on root containers
+   - Parking map scrolls horizontally inside its own box
+   ========================================= */
+
+/* ─── Layout Grids (used in Dashboard, ReserveParking) ─── */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 28px;
+  align-items: start;
+}
+
+.dashboard-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.reserve-grid {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ─── Admin Layout ─── */
+
+.admin-layout {
+  display: flex;
+  gap: 24px;
+  height: calc(100vh - 70px);
+}
+
+.admin-content-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.admin-content-main {
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+  padding-bottom: 40px;
+}
+
+/* ─── Parking Map Container ─── */
+
+.parking-map-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  /* Scrollbar visible */
+  scrollbar-width: thin;
+  scrollbar-color: #D5DDD8 transparent;
+}
+
+.parking-map-inner {
+  display: inline-block;
+  min-width: max-content;
+}
+
+/* ─── Table Responsive ─── */
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ─── Gatekeeper list items ─── */
+
+.gk-list-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: #F8FAF7;
+  border-radius: 20px;
+  border: 1px solid #EAEFEA;
+  transition: background 0.2s;
+}
+
+.gk-list-grid {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 16px;
+  align-items: center;
+}
+
+.gk-list-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Scan / QR Pass validation grid */
+.scan-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  gap: 24px;
+}
+
+/* Admin Quick Actions row */
+.admin-quick-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.admin-quick-action-item {
+  flex: 1;
+  padding: 0 20px;
+  border-right: 1px solid #EAEFEA;
+}
+
+.admin-quick-action-item:first-child {
+  padding-left: 0;
+}
+
+.admin-quick-action-item:last-child {
+  padding-right: 0;
+  border-right: none;
+}
+
+/* Mobile logout button (hidden on desktop) */
+.mobile-logout-btn {
+  display: none !important;
+}
+
+/* =========================================
+   Tablet: 1024px and below
    ========================================= */
 
 @media (max-width: 1024px) {
-  .app-content { padding: 20px; }
+  .app-content {
+    padding: 20px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .reserve-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-layout {
+    height: auto;
+  }
+
+  .admin-content-sidebar {
+    width: 200px;
+  }
+}
+
+/* =========================================
+   Mobile: 768px and below
+   ========================================= */
+
+@media (max-width: 768px) {
+
+  /* ─── App Shell: sidebar becomes bottom nav ─── */
+  .app-layout {
+    flex-direction: column-reverse;
+    height: 100dvh;
+    height: 100vh; /* fallback */
+  }
+
+  .app-sidebar {
+    /* Bottom navigation bar */
+    width: 100% !important;
+    height: 64px !important;
+    flex-direction: row !important;
+    flex-shrink: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+  }
+
+  /* Hide logo section */
+  .app-sidebar > div:first-child {
+    display: none !important;
+  }
+
+  /* Nav becomes horizontal */
+  .app-sidebar > nav {
+    display: flex !important;
+    flex-direction: row !important;
+    flex: 1;
+    align-items: center;
+    justify-content: space-around;
+    overflow-x: auto;
+    padding: 0 !important;
+  }
+
+  /* Nav sections become flat */
+  .app-sidebar > nav > div {
+    display: contents;
+  }
+
+  /* Each nav item: icon + tiny label stacked */
+  .nav-item {
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 3px !important;
+    padding: 6px 10px !important;
+    margin-bottom: 0 !important;
+    border-radius: 8px !important;
+    flex-shrink: 0;
+    min-width: 56px;
+    transform: none !important;
+  }
+
+  .nav-item span {
+    display: block !important;
+    font-size: 9px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 56px;
+    text-align: center;
+  }
+
+  .nav-item.active::before {
+    display: none;
+  }
+
+  /* Hide user footer in sidebar */
+  .app-sidebar > div:last-child {
+    display: none !important;
+  }
+
+  /* Hide sidebar wordmark & user text */
+  .sidebar-wordmark,
+  .sidebar-user-text {
+    display: none !important;
+  }
+
+  /* ─── Main area fills remaining space ─── */
+  .app-main {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* ─── Topbar ─── */
+  .app-topbar {
+    padding: 0 14px;
+    height: 54px;
+  }
+
+  /* Hide user identity chip on mobile topbar */
+  .app-topbar > div:nth-last-child(2) {
+    display: none;
+  }
+
+  /* Show mobile logout */
+  .mobile-logout-btn {
+    display: flex !important;
+  }
+
+  /* ─── Content area ─── */
+  .app-content {
+    padding: 14px;
+    /* Allow vertical scroll, prevent horizontal bleed */
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  /* ─── Dashboard grid: single column ─── */
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .dashboard-bottom-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  /* ─── Reserve page: single column ─── */
+  .reserve-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  /* ─── Scan / Pass verification: single column ─── */
+  .scan-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  /* ─── Admin layout: vertical stack ─── */
+  .admin-layout {
+    flex-direction: column;
+    height: auto;
+    gap: 16px;
+  }
+
+  .admin-content-sidebar {
+    width: 100% !important;
+    position: static !important;
+    flex-direction: row !important;
+    overflow-x: auto;
+    padding: 8px !important;
+    border-radius: 16px !important;
+  }
+
+  .admin-content-sidebar > div:first-child {
+    display: none;
+  }
+
+  .admin-content-sidebar > div {
+    white-space: nowrap;
+    padding: 10px 14px !important;
+    flex-shrink: 0;
+  }
+
+  .admin-quick-actions {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .admin-quick-action-item {
+    padding: 0 0 16px 0 !important;
+    border-right: none !important;
+    border-bottom: 1px solid #EAEFEA;
+  }
+
+  .admin-quick-action-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0 !important;
+  }
+
+  /* ─── Gatekeeper list items: vertical on mobile ─── */
+  .gk-list-item {
+    flex-wrap: wrap;
+  }
+
+  .gk-list-grid {
+    grid-template-columns: 1fr !important;
+    width: 100%;
+    gap: 10px !important;
+  }
+
+  .gk-list-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .gk-list-actions > button {
+    flex: 1;
+  }
+
+  /* ─── Table responsive ─── */
+  .table-responsive table {
+    min-width: 700px;
+  }
+
+  /* ─── Modal ─── */
+  .modal-backdrop {
+    padding: 16px;
+    align-items: flex-end;
+  }
+
+  .modal-box {
+    max-width: 100%;
+    border-radius: 20px 20px 16px 16px;
+    max-height: calc(100dvh - 80px);
+    overflow-y: auto;
+  }
+}
+
+/* =========================================
+   Small Mobile: 480px and below
+   ========================================= */
+
+@media (max-width: 480px) {
+  .app-content {
+    padding: 12px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .modal-box {
+    padding: 20px;
+    border-radius: 20px 20px 12px 12px;
+  }
+
+  .qr-pass {
+    border-radius: 16px;
+  }
+}
+
+/* Hero heading size */
+.dashboard-hero-h1 {
+  font-size: 42px;
 }
 
 @media (max-width: 768px) {
-  .app-sidebar {
-    width: 64px;
+  .dashboard-hero-h1 {
+    font-size: 28px;
   }
-  .nav-item span { display: none; }
-  .nav-item { justify-content: center; padding: 13px 0; gap: 0; }
-  .nav-item.active::before { left: 0; height: 100%; width: 2.5px; border-radius: 0 2px 2px 0; }
-  .app-content { padding: 16px; }
-  .app-topbar { padding: 0 16px; }
 }
 
 @media (max-width: 480px) {
-  .modal-box { padding: 20px; border-radius: 16px; }
-  .qr-pass { border-radius: 16px; }
+  .dashboard-hero-h1 {
+    font-size: 24px;
+  }
 }

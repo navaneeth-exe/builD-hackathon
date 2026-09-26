@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import NotificationCenter from './NotificationCenter';
+import { LogOut } from 'lucide-react';
 
 interface TopBarProps {
   title: string;
@@ -9,7 +10,7 @@ interface TopBarProps {
 }
 
 export default function TopBar({ title, subtitle, children }: TopBarProps) {
-  const { profile } = useAuth();
+  const { profile, logout } = useAuth();
 
   const initials = profile?.full_name
     ? profile.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
@@ -125,6 +126,24 @@ export default function TopBar({ title, subtitle, children }: TopBarProps) {
             )}
           </div>
         </div>
+      )}
+      
+      {/* Mobile Logout */}
+      {profile && (
+        <button 
+          onClick={logout}
+          className="mobile-logout-btn"
+          style={{
+            display: 'none',
+            background: 'none',
+            border: 'none',
+            color: '#DC2626',
+            cursor: 'pointer',
+            padding: '8px',
+          }}
+        >
+          <LogOut size={20} />
+        </button>
       )}
     </header>
   );

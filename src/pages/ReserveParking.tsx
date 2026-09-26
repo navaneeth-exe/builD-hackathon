@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ChevronRight, Calendar, Clock, MapPin, Car, ShieldCheck, AlertCircle } from 'lucide-react';
+import { ChevronRight, Calendar, Clock, MapPin, Car, ShieldCheck, AlertCircle, ArrowRight, QrCode, Check } from 'lucide-react';
 import TopBar from '../components/TopBar';
 import ParkingGrid, { ParkingLegend } from '../components/ParkingGrid';
 import { supabase } from '../lib/supabase';
@@ -250,8 +250,8 @@ export default function ReserveParking() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12 }}>
-                <button className="soft-btn-primary" style={{ padding: '16px', fontSize: 15 }} onClick={() => navigate('/bookings', { state: { showQR: confirmedBookingId } })}>
-                  View QR Pass →
+                <button className="soft-btn-primary" style={{ padding: '16px', fontSize: 15, justifyContent: 'center', gap: 8 }} onClick={() => navigate('/bookings', { state: { showQR: confirmedBookingId } })}>
+                  <QrCode size={18} /> View QR Pass <ArrowRight size={16} />
                 </button>
                 <button className="btn-secondary" style={{ borderRadius: 14, padding: '14px', justifyContent: 'center', border: 'none', background: '#F8FAF7' }} onClick={() => navigate('/bookings')}>
                   Go to My Bookings
@@ -286,7 +286,7 @@ export default function ReserveParking() {
                        boxShadow: isActive ? '0 8px 16px rgba(23,76,60,0.2)' : 'none',
                        transition: 'all 0.3s ease'
                    }}>
-                       {isDone ? '✓' : n}
+                       {isDone ? <Check size={14} strokeWidth={3} /> : n}
                    </div>
                    <span style={{ fontSize: 14, fontWeight: isActive ? 700 : 600, color: isActive ? '#1A2420' : '#627068', whiteSpace: 'nowrap' }}>{label}</span>
                 </div>
@@ -296,7 +296,7 @@ export default function ReserveParking() {
           })}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '340px 1fr', gap: 32, alignItems: 'start' }}>
+        <div className="reserve-grid">
           
           {/* Left: Input Form Panel */}
           <div className="soft-card" style={{ padding: '32px', position: 'sticky', top: 32, borderRadius: 24 }}>
@@ -376,12 +376,20 @@ export default function ReserveParking() {
 
           {/* Right: Immersive Slot Matrix */}
           <div className="soft-card map-container" style={{ 
-               padding: 0, overflow: 'hidden', borderRadius: 32, minHeight: 600, display: 'flex', flexDirection: 'column',
-               backgroundImage: 'radial-gradient(circle at center, rgba(250, 248, 242, 0.4) 0%, rgba(250, 248, 242, 0.9) 100%), url(/campus-bg.jpg)',
+               position: 'relative', overflow: 'hidden', padding: 0, 
+               borderRadius: 32, minHeight: 600, display: 'flex', flexDirection: 'column',
+               backgroundImage: 'url(/campus-bg.jpg)',
                backgroundSize: 'cover', backgroundPosition: 'center',
-               boxShadow: '0 24px 48px rgba(23,76,60,0.08), inset 0 2px 8px rgba(255,255,255,0.9)'
+               boxShadow: '0 24px 48px rgba(23,76,60,0.10), inset 0 2px 8px rgba(255,255,255,0.7)'
           }}>
-            <div style={{ padding: '24px 32px', background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(227,235,230,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            {/* Subtle overlay for contrast */}
+            <div style={{
+                position: 'absolute', inset: 0,
+                background: 'linear-gradient(180deg, rgba(250,248,242,0.15) 0%, rgba(250,248,242,0.35) 100%)',
+                pointerEvents: 'none', zIndex: 1,
+            }} />
+
+            <div style={{ padding: '24px 32px', background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(227,235,230,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 5, position: 'relative' }}>
               <div>
                 <h3 style={{ fontWeight: 800, fontSize: 16, color: '#174C3C', margin: 0 }}>Available Spots Matrix</h3>
                 <p style={{ fontSize: 13, color: '#627068', marginTop: 4, margin: 0 }}>Select any available green spot to reserve.</p>
@@ -389,7 +397,7 @@ export default function ReserveParking() {
               <ParkingLegend />
             </div>
 
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '40px' }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '40px', zIndex: 5, position: 'relative' }}>
                 {step === 1 ? (
                   <div className="empty-state" style={{ background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)', borderRadius: 24, padding: 40, border: '1px solid rgba(255,255,255,0.6)', boxShadow: '0 12px 32px rgba(23,76,60,0.05)' }}>
                     <MapPin size={32} color="#9AADA5" style={{ marginBottom: 16 }} />
@@ -399,20 +407,40 @@ export default function ReserveParking() {
                   <div className="spinner" />
                 ) : slots.length > 0 ? (
                   <div style={{
-                      padding: 40, background: 'rgba(255,255,255,0.95)', borderRadius: 32,
-                      boxShadow: '0 32px 64px rgba(23,76,60,0.1), 0 4px 16px rgba(0,0,0,0.04), inset 0 2px 4px rgba(255,255,255,1)',
-                      backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.6)',
-                      transform: 'rotateX(15deg) rotateZ(-1deg) translateY(-5px)', 
-                      transformOrigin: 'center', transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'rotateX(0deg) rotateZ(0deg) translateY(0)'; e.currentTarget.style.boxShadow = '0 16px 40px rgba(23,76,60,0.08), inset 0 2px 4px rgba(255,255,255,1)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'rotateX(15deg) rotateZ(-1deg) translateY(-5px)'; e.currentTarget.style.boxShadow = '0 32px 64px rgba(23,76,60,0.1), 0 4px 16px rgba(0,0,0,0.04), inset 0 2px 4px rgba(255,255,255,1)'; }}
-                  >
-                      <ParkingGrid
-                        slots={slots}
-                        selectedSlotId={selectedSlot?.id}
-                        onSlotClick={s => setSelectedSlot(prev => prev?.id === s.id ? null : s)}
-                      />
+                      padding: '24px 28px 20px',
+                      background: 'rgba(250, 248, 242, 0.75)',
+                      backdropFilter: 'blur(20px)',
+                      WebkitBackdropFilter: 'blur(20px)',
+                      borderRadius: 24,
+                      border: '1px solid rgba(220, 228, 220, 0.6)',
+                      boxShadow: '0 24px 48px rgba(23,76,60,0.12), 0 2px 8px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,1)',
+                      transform: 'translateZ(0)',
+                  }}>
+                      {/* Asphalt surface */}
+                  <div className="parking-map-scroll">
+                      <div className="parking-map-inner">
+                          <div style={{
+                              background: 'linear-gradient(160deg, #ECECE8 0%, #E4E4DF 100%)',
+                              borderRadius: 16,
+                              padding: '18px 14px',
+                              border: '1px solid rgba(180,180,170,0.4)',
+                              boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.06), inset 0 -1px 3px rgba(255,255,255,0.5)',
+                              position: 'relative', overflow: 'hidden',
+                          }}>
+                              {/* Subtle asphalt texture */}
+                              <div style={{
+                                  position: 'absolute', inset: 0, pointerEvents: 'none',
+                                  backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 18px, rgba(160,160,150,0.08) 18px, rgba(160,160,150,0.08) 19px)',
+                                  borderRadius: 16,
+                              }} />
+                              <ParkingGrid
+                                slots={slots}
+                                selectedSlotId={selectedSlot?.id}
+                                onSlotClick={s => setSelectedSlot(prev => prev?.id === s.id ? null : s)}
+                              />
+                          </div>
+                      </div>
+                  </div>
                   </div>
                 ) : (
                   <div className="empty-state" style={{ background: 'rgba(255,255,255,0.9)', borderRadius: 24, padding: 40 }}>
@@ -454,7 +482,7 @@ export default function ReserveParking() {
                      onClick={handleConfirmBooking}
                      disabled={booking}
                    >
-                     {booking ? 'Reserving...' : 'Confirm Booking →'}
+                     {booking ? 'Reserving...' : <>Confirm Booking <ArrowRight size={16} /></>}
                    </button>
                 </div>
               </div>

@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ParkingSquare, Plus, Search, X, CheckCircle, Clock, ShieldCheck, Database, QrCode } from 'lucide-react';
 import TopBar from '../components/TopBar';
-import StatCard from '../components/StatCard';
 import StatusBadge from '../components/StatusBadge';
 import {
   fetchAllBookings, fetchAllSlots, fetchParkingAreas, addParkingSlot, toggleSlotActive,
@@ -164,9 +163,9 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      <div className="app-content" style={{ display: 'flex', gap: 24, padding: '24px 32px', height: 'calc(100vh - 70px)', maxWidth: 1400, margin: '0 auto' }}>
+      <div className="app-content admin-layout" style={{ maxWidth: 1400, margin: '0 auto' }}>
         {/* Admin sidebar */}
-        <div className="soft-card" style={{ width: 260, padding: '16px', borderRadius: 28, display: 'flex', flexDirection: 'column', gap: 8, background: '#FFFFFF', alignSelf: 'flex-start' }}>
+        <div className="soft-card admin-content-sidebar" style={{ padding: '16px', borderRadius: 28, display: 'flex', flexDirection: 'column', gap: 8, background: '#FFFFFF', alignSelf: 'flex-start', position: 'sticky', top: 0 }}>
           <div style={{ padding: '12px 16px', marginBottom: 8 }}>
             <div style={{ fontSize: 11, fontWeight: 800, color: '#9AADA5', textTransform: 'uppercase', letterSpacing: '0.08em' }}>System Admin</div>
           </div>
@@ -191,7 +190,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Admin content */}
-        <div style={{ flex: 1, overflow: 'auto', paddingRight: 12, paddingBottom: 40 }}>
+        <div className="admin-content-main">
 
           {/* Overview */}
           {tab === 'overview' && (
@@ -233,22 +232,22 @@ export default function AdminDashboard() {
               </div>
 
               {/* Quick actions */}
-              <div className="soft-card" style={{ padding: '24px', borderRadius: 24, background: '#FFFFFF', marginBottom: 24, display: 'flex', gap: 12 }}>
-                <div style={{ flex: 1, paddingRight: 24, borderRight: '1px solid #EAEFEA' }}>
+              <div className="soft-card admin-quick-actions" style={{ padding: '24px', borderRadius: 24, background: '#FFFFFF', marginBottom: 24 }}>
+                <div className="admin-quick-action-item">
                   <div style={{ fontSize: 14, fontWeight: 800, color: '#1A2420', marginBottom: 6 }}>Manage Infrastructure</div>
                   <div style={{ fontSize: 12, color: '#627068', marginBottom: 16 }}>Add or modify parking slots across all zones.</div>
                   <button className="soft-btn-primary" style={{ width: '100%', borderRadius: 14, padding: '12px', justifyContent: 'center' }} onClick={() => { setShowAddSlot(true); setTab('slots'); }}>
                     <Plus size={16} /> Add Parking Slot
                   </button>
                 </div>
-                <div style={{ flex: 1, padding: '0 24px', borderRight: '1px solid #EAEFEA' }}>
+                <div className="admin-quick-action-item">
                   <div style={{ fontSize: 14, fontWeight: 800, color: '#1A2420', marginBottom: 6 }}>View Reservations</div>
                   <div style={{ fontSize: 12, color: '#627068', marginBottom: 16 }}>Search, filter, or cancel active bookings.</div>
                   <button className="btn-secondary" style={{ width: '100%', borderRadius: 14, padding: '12px', justifyContent: 'center' }} onClick={() => setTab('reservations')}>
                     Open Reservations
                   </button>
                 </div>
-                <div style={{ flex: 1, paddingLeft: 24 }}>
+                <div className="admin-quick-action-item" style={{ borderRight: 'none' }}>
                   <div style={{ fontSize: 14, fontWeight: 800, color: '#1A2420', marginBottom: 6 }}>Manual Validation</div>
                   <div style={{ fontSize: 12, color: '#627068', marginBottom: 16 }}>Override and validate passes manually.</div>
                   <button className="btn-secondary" style={{ width: '100%', borderRadius: 14, padding: '12px', justifyContent: 'center' }} onClick={() => setTab('scan')}>
@@ -314,7 +313,7 @@ export default function AdminDashboard() {
                      <div style={{ fontSize: 15, fontWeight: 700, color: '#1A2420' }}>No slots configured</div>
                   </div>
                 ) : (
-                  <div style={{ overflowX: 'auto' }}>
+                  <div className="table-responsive" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                       <thead>
                         <tr style={{ background: '#F8FAF7', textAlign: 'left', color: '#627068', borderBottom: '1px solid #EAEFEA' }}>
@@ -412,7 +411,7 @@ export default function AdminDashboard() {
                      <div style={{ fontSize: 15, fontWeight: 700, color: '#1A2420' }}>No bookings match filters</div>
                   </div>
                 ) : (
-                  <div style={{ overflowX: 'auto' }}>
+                  <div className="table-responsive" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                       <thead>
                         <tr style={{ background: '#F8FAF7', textAlign: 'left', color: '#627068', borderBottom: '1px solid #EAEFEA' }}>
@@ -512,7 +511,7 @@ function InlineScan() {
     if (!booking || booking.status !== 'CONFIRMED') return;
     try {
       await updateBookingStatus(booking.id, 'CHECKED_IN');
-      setMsg('✅ Checked in successfully.'); setBooking({ ...booking, status: 'CHECKED_IN' });
+      setMsg('Checked in successfully.'); setBooking({ ...booking, status: 'CHECKED_IN' });
     } catch (e: any) { setError(e.message ?? 'Failed to check in.'); }
   }
 
@@ -520,7 +519,7 @@ function InlineScan() {
     if (!booking || booking.status !== 'CHECKED_IN') return;
     try {
       await updateBookingStatus(booking.id, 'COMPLETED');
-      setMsg('✅ Checked out successfully.'); setBooking({ ...booking, status: 'COMPLETED' });
+      setMsg('Checked out successfully.'); setBooking({ ...booking, status: 'COMPLETED' });
     } catch (e: any) { setError(e.message ?? 'Failed to check out.'); }
   }
 
@@ -541,8 +540,8 @@ function InlineScan() {
         </div>
       </div>
 
-      {error && <div style={{ color: '#991B1B', fontSize: 13, padding: '14px 16px', background: '#FEF2F2', borderRadius: 14, marginBottom: 16, border: '1px solid #FEE2E2', fontWeight: 600 }}>{error}</div>}
-      {msg && <div style={{ color: '#065F46', fontSize: 13, padding: '14px 16px', background: '#ECFDF5', borderRadius: 14, marginBottom: 16, border: '1px solid #D1FAE5', fontWeight: 700 }}>{msg}</div>}
+      {error && <div style={{ color: '#991B1B', fontSize: 13, padding: '14px 16px', background: '#FEF2F2', borderRadius: 14, marginBottom: 16, border: '1px solid #FEE2E2', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}><X size={16} />{error}</div>}
+      {msg && <div style={{ color: '#065F46', fontSize: 13, padding: '14px 16px', background: '#ECFDF5', borderRadius: 14, marginBottom: 16, border: '1px solid #D1FAE5', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}><CheckCircle size={16} />{msg}</div>}
 
       {booking && (
         <div style={{ background: '#F8FAF7', padding: '24px', borderRadius: 20, border: '1px solid #EAEFEA' }}>

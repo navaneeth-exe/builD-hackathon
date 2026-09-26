@@ -17,11 +17,14 @@ export default function QRPassModal({ booking, onClose }: QRPassModalProps) {
     <div className="modal-backdrop" style={{ 
        backgroundColor: 'rgba(23, 76, 60, 0.4)', 
        backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-       display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+       display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+       padding: '16px',
     }} onClick={e => e.target === e.currentTarget && onClose()}>
       <div style={{ 
           background: 'transparent', width: '100%', maxWidth: 420, 
-          position: 'relative', display: 'flex', flexDirection: 'column', gap: 16
+          position: 'relative', display: 'flex', flexDirection: 'column', gap: 16,
+          maxHeight: 'calc(100dvh - 32px)', overflowY: 'auto', borderRadius: 28,
+          WebkitOverflowScrolling: 'touch',
       }}>
         {/* Ticket Container */}
         <div style={{

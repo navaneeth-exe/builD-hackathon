@@ -95,7 +95,7 @@ export default function BookingLookup() {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {bookings.map(b => (
-                  <div key={b.id} style={{ 
+                  <div key={b.id} className="gk-list-item" style={{ 
                       display: 'flex', alignItems: 'center', gap: 16, 
                       padding: '20px', background: '#F8FAF7', borderRadius: 20,
                       border: '1px solid #EAEFEA', transition: 'background 0.2s',
@@ -105,7 +105,7 @@ export default function BookingLookup() {
                          <User size={24} color="#174C3C" />
                       </div>
                       
-                      <div style={{ flex: 1, minWidth: 0, display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr 1fr', gap: 16, alignItems: 'center' }}>
+                      <div className="gk-list-grid" style={{ flex: 1, minWidth: 0, display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr 1fr', gap: 16, alignItems: 'center' }}>
                           <div>
                               <div style={{ fontSize: 15, fontWeight: 800, color: '#1A2420', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{b.user_name}</div>
                               <div style={{ fontSize: 12, color: '#627068', marginTop: 4, fontFamily: 'monospace', fontWeight: 600 }}>
