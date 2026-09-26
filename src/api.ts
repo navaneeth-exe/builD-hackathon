@@ -51,6 +51,7 @@ function mapReservation(raw: any) {
     start_time: raw.start_time,
     end_time: raw.end_time,
     status: raw.status as BookingStatus,
+    license_plate: raw.license_plate ?? 'N/A',
     checked_in_at: raw.checked_in_at ?? null,
     checked_out_at: raw.checked_out_at ?? null,
     created_at: raw.created_at,
@@ -171,7 +172,8 @@ export async function createBooking(
   startTime: string,
   endTime: string,
   userName: string,
-  userRole: string
+  userRole: string,
+  licensePlate: string = 'N/A'
 ) {
   // Generate a deterministic reference code client-side
   const now = new Date();
@@ -183,7 +185,7 @@ export async function createBooking(
     p_slot_id: slotId,
     p_user_name: userName,
     p_user_type: userRole,
-    p_license_plate: 'N/A',
+    p_license_plate: licensePlate.toUpperCase().trim() || 'N/A',
     p_start_time: startTime,
     p_end_time: endTime,
     p_reference_code: refCode,
@@ -206,24 +208,40 @@ export async function fetchMyBookings() {
 }
 
 export async function fetchBookingByCode(code: string) {
-  // Try reference_code first, then qr_token
-  let { data, error } = await supabase
+  const cleanCode = (code || '').trim();
+  if (!cleanCode) throw new Error('Booking code cannot be empty.');
+
+  // Try reference_code first
+  let { data } = await supabase
     .from('reservations')
     .select('*, slots(*, lots(*))')
-    .eq('reference_code', code)
-    .single();
+    .eq('reference_code', cleanCode)
+    .maybeSingle();
 
-  if (error || !data) {
+  // Then try qr_token
+  if (!data) {
     const res2 = await supabase
       .from('reservations')
       .select('*, slots(*, lots(*))')
-      .eq('qr_token', code)
-      .single();
+      .eq('qr_token', cleanCode)
+      .maybeSingle();
     data = res2.data;
-    error = res2.error;
   }
 
-  if (error) throw error;
+  // Then try id (UUID or string)
+  if (!data) {
+    const res3 = await supabase
+      .from('reservations')
+      .select('*, slots(*, lots(*))')
+      .eq('id', cleanCode)
+      .maybeSingle();
+    data = res3.data;
+  }
+
+  if (!data) {
+    throw new Error('No booking found with that ID or QR pass.');
+  }
+
   return mapReservation(data);
 }
 

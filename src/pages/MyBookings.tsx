@@ -4,6 +4,7 @@ import { BookOpen, QrCode, Calendar, Clock } from 'lucide-react';
 import TopBar from '../components/TopBar';
 import StatusBadge from '../components/StatusBadge';
 import QRPassModal from '../components/QRPassModal';
+import { supabase } from '../lib/supabase';
 import { fetchMyBookings, cancelBooking, formatDate, formatTime, formatDuration } from '../api';
 import type { Booking } from '../types';
 import { useAuth } from '../contexts/AuthContext';
@@ -37,7 +38,23 @@ export default function MyBookings() {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+
+    const channel = supabase
+      .channel('my-bookings-sync')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'reservations' }, () => {
+        load();
+      })
+      .subscribe();
+
+    const interval = setInterval(load, 15000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(interval);
+    };
+  }, []);
 
   const now = new Date();
   const upcoming = bookings.filter(b =>

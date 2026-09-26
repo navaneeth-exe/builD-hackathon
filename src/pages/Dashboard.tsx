@@ -4,6 +4,7 @@ import { ParkingSquare, Car, Zap, MapPin, Clock } from 'lucide-react';
 import TopBar from '../components/TopBar';
 import StatCard from '../components/StatCard';
 import ParkingGrid, { ParkingLegend } from '../components/ParkingGrid';
+import { supabase } from '../lib/supabase';
 import {
   fetchParkingAreas, fetchSlotsForArea, fetchDashboardStats,
   fetchConflictingSlotIds, computeSlotStatus,
@@ -57,7 +58,26 @@ export default function Dashboard() {
   }, [selectedArea]);
 
   useEffect(() => { loadAreas(); }, [loadAreas]);
-  useEffect(() => { loadSlotsAndStats(); }, [loadSlotsAndStats]);
+  useEffect(() => {
+    loadSlotsAndStats();
+
+    const channel = supabase
+      .channel('user-dashboard-sync')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'reservations' }, () => {
+        loadSlotsAndStats();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'slots' }, () => {
+        loadSlotsAndStats();
+      })
+      .subscribe();
+
+    const interval = setInterval(loadSlotsAndStats, 15000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(interval);
+    };
+  }, [loadSlotsAndStats]);
 
   const { profile } = useAuth();
   

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import TopBar from '../../components/TopBar';
 import { supabase } from '../../lib/supabase';
-import { fetchAllBookings } from '../../api';
+import { fetchAllBookings, formatTime } from '../../api';
 import type { Booking } from '../../types';
 import { Loader2 } from 'lucide-react';
 
@@ -41,47 +41,75 @@ export default function LiveParking() {
 
   useEffect(() => {
     loadData();
+
+    // Subscribe to real-time reservation and slot changes
+    const channel = supabase
+      .channel('live-parking-sync')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'reservations' }, () => {
+        loadData();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'slots' }, () => {
+        loadData();
+      })
+      .subscribe();
+
+    const interval = setInterval(loadData, 15000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(interval);
+    };
   }, []);
 
   const getSlotStatus = (slot: Slot) => {
     if (!slot.is_active) return { status: 'UNAVAILABLE', color: '#E8EBE8', text: '#68736B' };
     
-    // Check if slot has a CHECKED_IN booking
+    // Check if slot has a CHECKED_IN booking currently
     const activeBooking = bookings.find(b => b.slot_id === slot.id && b.status === 'CHECKED_IN');
     if (activeBooking) return { status: 'OCCUPIED', color: '#FCE2E2', text: '#B91C1C', booking: activeBooking };
     
-    // Check if slot has a CONFIRMED booking starting soon or right now
+    // Check if slot has any active or upcoming CONFIRMED reservation
     const now = new Date().getTime();
-    const reservedBooking = bookings.find(b => {
-      if (b.slot_id !== slot.id) return false;
-      if (b.status !== 'CONFIRMED') return false;
-      const start = new Date(b.start_time).getTime();
-      const end = new Date(b.end_time).getTime();
-      return now >= start - 1000 * 60 * 60 && now <= end; // active or starting within 1 hr
-    });
-    
-    if (reservedBooking) return { status: 'RESERVED', color: '#FEF0C7', text: '#92400E', booking: reservedBooking };
+    // Prioritize currently active or upcoming CONFIRMED booking
+    const activeOrUpcoming = bookings
+      .filter(b => b.slot_id === slot.id && b.status === 'CONFIRMED' && new Date(b.end_time).getTime() > now)
+      .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+
+    if (activeOrUpcoming.length > 0) {
+      const reservedBooking = activeOrUpcoming[0];
+      return { status: 'RESERVED', color: '#FEF0C7', text: '#92400E', booking: reservedBooking };
+    }
     
     return { status: 'AVAILABLE', color: '#DDF5E5', text: '#065F46' };
   };
 
   return (
     <>
-      <TopBar title="Live Parking" subtitle="Monitor real-time slot occupancy" />
+      <TopBar title="Live Parking" subtitle="Monitor real-time slot occupancy and reservations" />
       <div className="app-content">
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}><Loader2 className="spinner" /></div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 16 }}>
             {slots.map(slot => {
               const { status, color, text, booking } = getSlotStatus(slot);
               return (
-                <div key={slot.id} className="ps-card" style={{ padding: 16, background: color, borderColor: 'rgba(0,0,0,0.05)', textAlign: 'center' }}>
-                  <div style={{ fontSize: 18, fontWeight: 700, color: text }}>{slot.slot_number}</div>
-                  <div style={{ fontSize: 11, color: text, opacity: 0.8, marginTop: 4 }}>{status}</div>
+                <div key={slot.id} className="ps-card" style={{ padding: 16, background: color, borderColor: 'rgba(0,0,0,0.06)', textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: text }}>{slot.slot_number}</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: text, opacity: 0.9, marginTop: 4, letterSpacing: '0.04em' }}>{status}</div>
+                  </div>
                   {booking && (
-                    <div style={{ marginTop: 8, fontSize: 11, fontWeight: 600, color: text, background: 'rgba(255,255,255,0.4)', padding: '4px', borderRadius: 4 }}>
-                      {booking.license_plate}
+                    <div style={{ marginTop: 10, fontSize: 11, fontWeight: 600, color: text, background: 'rgba(255,255,255,0.65)', padding: '6px 8px', borderRadius: 6 }}>
+                      {booking.license_plate && booking.license_plate !== 'N/A' && (
+                        <div style={{ fontWeight: 700, marginBottom: 2 }}>{booking.license_plate}</div>
+                      )}
+                      <div style={{ fontSize: 10, opacity: 0.85 }}>
+                        {formatTime(booking.start_time)} – {formatTime(booking.end_time)}
+                      </div>
+                      <div style={{ fontSize: 9.5, opacity: 0.75, marginTop: 2 }}>
+                        {booking.user_name}
+                      </div>
                     </div>
                   )}
                 </div>

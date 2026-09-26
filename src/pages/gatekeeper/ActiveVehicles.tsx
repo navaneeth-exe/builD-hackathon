@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import TopBar from '../../components/TopBar';
 import StatusBadge from '../../components/StatusBadge';
+import { supabase } from '../../lib/supabase';
 import { fetchAllBookings, updateBookingStatus, formatTime } from '../../api';
 import type { Booking } from '../../types';
 import { Loader2 } from 'lucide-react';
@@ -23,6 +24,20 @@ export default function ActiveVehicles() {
 
   useEffect(() => {
     loadData();
+
+    const channel = supabase
+      .channel('active-vehicles-sync')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'reservations' }, () => {
+        loadData();
+      })
+      .subscribe();
+
+    const interval = setInterval(loadData, 15000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(interval);
+    };
   }, []);
 
   const handleCheckout = async (id: string) => {
@@ -66,7 +81,8 @@ export default function ActiveVehicles() {
                     </td>
                     <td style={{ padding: '14px 20px', fontWeight: 600 }}>{b.license_plate}</td>
                     <td style={{ padding: '14px 20px' }}>
-                      <StatusBadge status="CHECKED_IN" label={b.parking_slots?.slot_number ?? ''} />
+                      <span style={{ fontWeight: 700, marginRight: 6 }}>{b.parking_slots?.slot_number ?? '—'}</span>
+                      <StatusBadge status="CHECKED_IN" small />
                     </td>
                     <td style={{ padding: '14px 20px', color: '#68736B' }}>{formatTime(b.checked_in_at ?? b.start_time)}</td>
                     <td style={{ padding: '14px 20px', textAlign: 'right' }}>

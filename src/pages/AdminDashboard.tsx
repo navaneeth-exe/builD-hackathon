@@ -7,6 +7,7 @@ import {
   fetchAllBookings, fetchAllSlots, fetchParkingAreas, addParkingSlot, toggleSlotActive,
   fetchDashboardStats, updateBookingStatus,
 } from '../api';
+import { supabase } from '../lib/supabase';
 import type { Booking, ParkingSlot, ParkingArea, DashboardStats } from '../types';
 import { formatDate, formatTime } from '../api';
 
@@ -51,7 +52,26 @@ export default function AdminDashboard() {
     }
   }, [statusFilter, search]);
 
-  useEffect(() => { loadAll(); }, [loadAll]);
+  useEffect(() => {
+    loadAll();
+
+    const channel = supabase
+      .channel('admin-dashboard-sync')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'reservations' }, () => {
+        loadAll();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'slots' }, () => {
+        loadAll();
+      })
+      .subscribe();
+
+    const interval = setInterval(loadAll, 15000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(interval);
+    };
+  }, [loadAll]);
 
   async function handleAddSlot() {
     if (!newSlotNumber.trim()) { setAddSlotError('Slot number is required.'); return; }
@@ -242,14 +262,31 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {slots.map(s => (
-                      <tr key={s.id}>
-                        <td style={{ fontWeight: 600 }}>{s.slot_number}</td>
-                        <td style={{ color: '#68736B' }}>{(s as any).parking_areas?.name}</td>
-                        <td>{s.slot_type}</td>
-                        <td>
-                          <StatusBadge status={s.is_active ? 'AVAILABLE' : 'UNAVAILABLE'} small />
-                        </td>
+                    {slots.map(s => {
+                      let currentStatus = s.is_active ? 'AVAILABLE' : 'UNAVAILABLE';
+                      if (s.is_active) {
+                        const occupied = bookings.find(b => b.slot_id === s.id && b.status === 'CHECKED_IN');
+                        if (occupied) {
+                          currentStatus = 'OCCUPIED';
+                        } else {
+                          const now = new Date().getTime();
+                          const reserved = bookings.find(b =>
+                            b.slot_id === s.id &&
+                            b.status === 'CONFIRMED' &&
+                            new Date(b.end_time).getTime() > now
+                          );
+                          if (reserved) currentStatus = 'RESERVED';
+                        }
+                      }
+
+                      return (
+                        <tr key={s.id}>
+                          <td style={{ fontWeight: 600 }}>{s.slot_number}</td>
+                          <td style={{ color: '#68736B' }}>{(s as any).parking_areas?.name}</td>
+                          <td>{s.slot_type}</td>
+                          <td>
+                            <StatusBadge status={currentStatus} small />
+                          </td>
                         <td>
                           <button
                             style={{
@@ -263,7 +300,8 @@ export default function AdminDashboard() {
                           </button>
                         </td>
                       </tr>
-                    ))}
+                    );
+                  })}
                   </tbody>
                 </table>
                 {slots.length === 0 && (

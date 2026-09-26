@@ -4,6 +4,7 @@ import { ChevronRight } from 'lucide-react';
 import TopBar from '../components/TopBar';
 import ParkingGrid, { ParkingLegend } from '../components/ParkingGrid';
 import StatusBadge from '../components/StatusBadge';
+import { supabase } from '../lib/supabase';
 import {
   fetchParkingAreas, fetchSlotsForArea, fetchConflictingSlotIds,
   computeSlotStatus, createBooking,
@@ -45,6 +46,7 @@ export default function ReserveParking() {
   const [dateStr, setDateStr] = useState(toLocalInput(now));
   const [startTime, setStartTime] = useState(toTimeInput(defaultStart));
   const [endTime, setEndTime] = useState(toTimeInput(defaultEnd));
+  const [licensePlate, setLicensePlate] = useState('');
   const [slots, setSlots] = useState<SlotWithStatus[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<SlotWithStatus | null>(preSelected?.slot ?? null);
   const [loadingSlots, setLoadingSlots] = useState(false);
@@ -85,7 +87,23 @@ export default function ReserveParking() {
   }, [selectedArea, dateStr, startTime, endTime]);
 
   useEffect(() => {
-    if (step === 2) loadAvailability();
+    if (step === 2) {
+      loadAvailability();
+
+      const channel = supabase
+        .channel('reserve-parking-sync')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'reservations' }, () => {
+          loadAvailability();
+        })
+        .subscribe();
+
+      const interval = setInterval(loadAvailability, 10000);
+
+      return () => {
+        supabase.removeChannel(channel);
+        clearInterval(interval);
+      };
+    }
   }, [step, loadAvailability]);
 
   function validateStep1(): string {
@@ -107,7 +125,14 @@ export default function ReserveParking() {
     try {
       const startISO = buildISO(dateStr, startTime);
       const endISO = buildISO(dateStr, endTime);
-      const id = await createBooking(selectedSlot.id, startISO, endISO, profile.full_name || 'User', profile.role || 'student');
+      const id = await createBooking(
+        selectedSlot.id,
+        startISO,
+        endISO,
+        profile.full_name || 'User',
+        profile.role || 'student',
+        licensePlate || 'N/A'
+      );
       setConfirmedBookingId(id);
       setStep(3);
     } catch (e: any) {
@@ -271,6 +296,17 @@ export default function ReserveParking() {
               >
                 {areas.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
               </select>
+            </div>
+
+            <div className="form-group">
+              <label className="ps-label">Vehicle Plate (optional)</label>
+              <input
+                type="text"
+                className="ps-input"
+                placeholder="e.g. KA-01-AB-1234"
+                value={licensePlate}
+                onChange={e => setLicensePlate(e.target.value.toUpperCase())}
+              />
             </div>
 
             {error && (

@@ -5,6 +5,7 @@ import ReserveParking from './pages/ReserveParking';
 import MyBookings from './pages/MyBookings';
 import ScanQR from './pages/ScanQR';
 import AdminDashboard from './pages/AdminDashboard';
+import ErrorBoundary from './components/ErrorBoundary';
 import Login from './pages/Login';
 import GatekeeperOverview from './pages/gatekeeper/Overview';
 import GatekeeperParking from './pages/gatekeeper/LiveParking';
@@ -46,7 +47,9 @@ function AppLayout({ children }: { children: React.ReactNode }) {
     <div className="app-layout">
       <Sidebar />
       <main className="app-main">
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
       </main>
     </div>
   );

@@ -10,7 +10,7 @@ export default function Sidebar() {
   const isAdmin = profile?.role === 'admin';
   const isStudent = profile?.role === 'student' || !profile?.role;
 
-  let NAV = [];
+  let NAV: Array<{ to: string; icon: any; label: string }> = [];
 
   if (isStudent) {
     NAV = [

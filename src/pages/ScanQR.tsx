@@ -2,11 +2,45 @@ import { useState, useEffect, useRef } from 'react';
 import { QrCode, Keyboard, CheckCircle, XCircle } from 'lucide-react';
 import TopBar from '../components/TopBar';
 import StatusBadge from '../components/StatusBadge';
-import { fetchBookingByCode, updateBookingStatus, fetchAllBookings } from '../api';
+import { fetchBookingByCode, updateBookingStatus } from '../api';
 import type { Booking } from '../types';
 import { formatDate, formatTime } from '../api';
 
 type Mode = 'scan' | 'manual';
+
+function parseScannedCode(rawText: string): string {
+  let text = (rawText || '').trim();
+  if (!text) return '';
+
+  // If URL, extract parameter or last path segment
+  if (text.startsWith('http://') || text.startsWith('https://')) {
+    try {
+      const url = new URL(text);
+      const codeParam = url.searchParams.get('code') || url.searchParams.get('id') || url.searchParams.get('booking_code');
+      if (codeParam) return codeParam.trim();
+      const segments = url.pathname.split('/').filter(Boolean);
+      if (segments.length > 0) return segments[segments.length - 1].trim();
+    } catch (_) {}
+  }
+
+  // If JSON
+  if ((text.startsWith('{') && text.endsWith('}')) || (text.startsWith('"') && text.endsWith('"'))) {
+    try {
+      const parsed = JSON.parse(text);
+      if (typeof parsed === 'string') return parsed.trim();
+      if (parsed.booking_code) return String(parsed.booking_code).trim();
+      if (parsed.reference_code) return String(parsed.reference_code).trim();
+      if (parsed.code) return String(parsed.code).trim();
+      if (parsed.id) return String(parsed.id).trim();
+    } catch (_) {}
+  }
+
+  if ((text.startsWith('"') && text.endsWith('"')) || (text.startsWith("'") && text.endsWith("'"))) {
+    text = text.slice(1, -1).trim();
+  }
+
+  return text;
+}
 
 export default function ScanQR() {
   const [mode, setMode] = useState<Mode>('scan');
@@ -19,49 +53,78 @@ export default function ScanQR() {
   const [cameraOn, setCameraOn] = useState(false);
   const videoRef = useRef<HTMLDivElement>(null);
   const scannerRef = useRef<any>(null);
+  const isProcessingRef = useRef(false);
+
+  const stopScanner = async () => {
+    if (scannerRef.current) {
+      const scanner = scannerRef.current;
+      scannerRef.current = null;
+      try {
+        if (scanner.isScanning) {
+          await scanner.stop();
+        }
+        scanner.clear();
+      } catch (e) {
+        console.warn('Scanner cleanup:', e);
+      }
+    }
+  };
 
   // Attempt camera scan via html5-qrcode
   useEffect(() => {
-    if (mode !== 'scan' || !cameraOn) return;
+    if (mode !== 'scan' || !cameraOn) {
+      stopScanner();
+      return;
+    }
 
-    let mounted = true;
-    let html5QrCode: any;
+    let isMounted = true;
 
     import('html5-qrcode').then(({ Html5Qrcode }) => {
-      if (!mounted || !videoRef.current) return;
-      const id = 'qr-reader-el';
-      const el = document.getElementById(id);
+      if (!isMounted) return;
+      const el = document.getElementById('qr-reader-el');
       if (!el) return;
-      html5QrCode = new Html5Qrcode(id);
+
+      const html5QrCode = new Html5Qrcode('qr-reader-el');
       scannerRef.current = html5QrCode;
 
       html5QrCode.start(
         { facingMode: 'environment' },
         { fps: 10, qrbox: { width: 200, height: 200 } },
-        (decodedText: string) => {
-          html5QrCode.stop();
+        async (decodedText: string) => {
+          if (isProcessingRef.current || !isMounted) return;
+          isProcessingRef.current = true;
+
+          try {
+            await stopScanner();
+          } catch (_) {}
+
           setCameraOn(false);
-          setInputCode(decodedText);
-          handleValidate(decodedText);
+          const clean = parseScannedCode(decodedText);
+          setInputCode(clean);
+          handleValidate(clean);
+
+          setTimeout(() => {
+            isProcessingRef.current = false;
+          }, 600);
         },
         () => {}
-      ).catch(() => {
-        setError('Camera not available. Use manual entry below.');
+      ).catch((err) => {
+        console.warn('Camera error:', err);
+        setError('Camera not available or access denied. Use manual entry below.');
         setCameraOn(false);
       });
     });
 
     return () => {
-      mounted = false;
-      if (scannerRef.current) {
-        scannerRef.current.stop().catch(() => {});
-      }
+      isMounted = false;
+      stopScanner();
     };
   }, [cameraOn, mode]);
 
   async function handleValidate(code?: string) {
-    const c = (code ?? inputCode).trim();
-    if (!c) { setError('Enter a booking ID.'); return; }
+    const raw = code !== undefined ? code : inputCode;
+    const c = parseScannedCode(raw);
+    if (!c) { setError('Enter a booking ID or scan a pass.'); return; }
 
     setLoading(true);
     setError('');
@@ -76,7 +139,7 @@ export default function ScanQR() {
 
       setBooking(b);
     } catch (e: any) {
-      setError(e.message?.includes('PGRST116') ? 'No booking found with that ID.' : (e.message ?? 'Validation failed.'));
+      setError(e.message ?? 'No booking found with that ID.');
     } finally {
       setLoading(false);
     }
@@ -166,9 +229,12 @@ export default function ScanQR() {
                     }} />
                   ))}
 
-                  {cameraOn ? (
-                    <div id="qr-reader-el" ref={videoRef as any} style={{ width: '100%', height: '100%' }} />
-                  ) : (
+                  <div 
+                    id="qr-reader-el" 
+                    ref={videoRef as any} 
+                    style={{ width: '100%', height: '100%', display: cameraOn ? 'block' : 'none' }} 
+                  />
+                  {!cameraOn && (
                     <div>
                       <QrCode size={48} color="rgba(255,255,255,0.2)" />
                       <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, marginTop: 10 }}>
@@ -261,24 +327,25 @@ export default function ScanQR() {
                     background: '#DDF5E5', display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontWeight: 700, fontSize: 12, color: '#065F46',
                   }}>
-                    {booking.parking_slots?.slot_number}
+                    {booking.parking_slots?.slot_number ?? '—'}
                   </div>
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: 13 }}>{booking.parking_slots?.slot_number}</div>
-                    <div style={{ fontSize: 11.5, color: '#68736B' }}>{booking.parking_slots?.parking_areas?.name}</div>
+                    <div style={{ fontWeight: 600, fontSize: 13 }}>{booking.parking_slots?.slot_number ?? 'Assigned Slot'}</div>
+                    <div style={{ fontSize: 11.5, color: '#68736B' }}>{booking.parking_slots?.parking_areas?.name ?? 'Campus Lot'}</div>
                   </div>
                 </div>
 
                 {[
-                  { label: 'Date', value: formatDate(booking.start_time) },
-                  { label: 'Time', value: `${formatTime(booking.start_time)} – ${formatTime(booking.end_time)}` },
-                  { label: 'Booking ID', value: booking.booking_code },
-                  { label: 'User', value: booking.user_name },
+                  { label: 'Date', value: booking.start_time ? formatDate(booking.start_time) : 'N/A' },
+                  { label: 'Time', value: booking.start_time && booking.end_time ? `${formatTime(booking.start_time)} – ${formatTime(booking.end_time)}` : 'N/A' },
+                  { label: 'Booking ID', value: booking.booking_code || 'N/A' },
+                  { label: 'User', value: booking.user_name || 'N/A' },
+                  { label: 'Vehicle Plate', value: booking.license_plate && booking.license_plate !== 'N/A' ? booking.license_plate : 'N/A' },
                 ].map(r => (
                   <div key={r.label} style={{
                     display: 'flex', padding: '7px 0', borderBottom: '1px solid #F0F2EF', fontSize: 12.5,
                   }}>
-                    <span style={{ color: '#68736B', width: 80 }}>{r.label}</span>
+                    <span style={{ color: '#68736B', width: 90 }}>{r.label}</span>
                     <span style={{ fontWeight: 500, fontFamily: r.label === 'Booking ID' ? 'monospace' : undefined }}>{r.value}</span>
                   </div>
                 ))}
@@ -308,7 +375,13 @@ export default function ScanQR() {
               </div>
             )}
 
-            {!booking && !error && !success && (
+            {loading && (
+              <div className="ps-card" style={{ textAlign: 'center', padding: '32px 20px' }}>
+                <div style={{ fontSize: 13, color: '#68736B', fontWeight: 500 }}>Loading booking details...</div>
+              </div>
+            )}
+
+            {!booking && !error && !success && !loading && (
               <div className="ps-card" style={{ textAlign: 'center', padding: '32px 20px' }}>
                 <QrCode size={32} color="#C9CFC8" style={{ marginBottom: 8 }} />
                 <div style={{ fontSize: 13, color: '#68736B', fontWeight: 500 }}>Booking Details</div>

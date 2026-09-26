@@ -40,6 +40,7 @@ export interface Booking {
   start_time: string;
   end_time: string;
   status: BookingStatus;
+  license_plate?: string;
   checked_in_at: string | null;
   checked_out_at: string | null;
   created_at: string;

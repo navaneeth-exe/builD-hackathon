@@ -18,7 +18,7 @@ export default function Login() {
   // If already logged in, redirect appropriately
   if (!loading && user && profile) {
     if (profile.role === 'admin') return <Navigate to="/admin" replace />;
-    if (profile.role === 'staff') return <Navigate to="/scan" replace />;
+    if (profile.role === 'staff') return <Navigate to="/gatekeeper" replace />;
     return <Navigate to="/dashboard" replace />;
   }
   if (!loading && user && !profile) {
@@ -130,7 +130,17 @@ export default function Login() {
                   autoFocus
                 />
               </div>
-
+              <div className="form-group">
+                <label className="ps-label">Account Role</label>
+                <select
+                  className="ps-input"
+                  value={role}
+                  onChange={e => setRole(e.target.value)}
+                >
+                  <option value="student">Student / User</option>
+                  <option value="staff">Gatekeeper / Staff</option>
+                </select>
+              </div>
             </>
           )}
 

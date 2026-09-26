@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { CheckCircle, QrCode, LayoutDashboard } from 'lucide-react';
 import TopBar from '../../components/TopBar';
 import StatusBadge from '../../components/StatusBadge';
+import { supabase } from '../../lib/supabase';
 import { fetchAllBookings, formatTime, fetchDashboardStats } from '../../api';
 import type { Booking } from '../../types';
 
@@ -28,7 +29,20 @@ export default function Overview() {
 
   useEffect(() => {
     loadData();
-    // In a real app we might set an interval here
+
+    const channel = supabase
+      .channel('gatekeeper-overview-sync')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'reservations' }, () => {
+        loadData();
+      })
+      .subscribe();
+
+    const interval = setInterval(loadData, 15000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(interval);
+    };
   }, []);
 
   return (
