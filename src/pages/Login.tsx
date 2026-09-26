@@ -315,7 +315,7 @@ export default function Login() {
                     className="soft-input"
                     value={fullName}
                     onChange={e => setFullName(e.target.value)}
-                    placeholder="e.g. Navaneeth Kumar"
+                    placeholder="e.g. Alex Morgan"
                     required
                     autoFocus
                   />
