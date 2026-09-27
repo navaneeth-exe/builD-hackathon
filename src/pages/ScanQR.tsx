@@ -86,7 +86,7 @@ export default function ScanQR() {
 
       html5QrCode.start(
         { facingMode: 'environment' },
-        { fps: 10, qrbox: { width: 220, height: 220 } },
+        { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
         async (decodedText: string) => {
           if (isProcessingRef.current || !isMounted) return;
           isProcessingRef.current = true;
@@ -211,34 +211,59 @@ export default function ScanQR() {
 
             {mode === 'scan' ? (
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <style>{`
+                  @keyframes scanline {
+                    0% { transform: translateY(0); opacity: 0; }
+                    10% { opacity: 1; }
+                    90% { opacity: 1; }
+                    100% { transform: translateY(280px); opacity: 0; }
+                  }
+                `}</style>
                 {/* Scanner frame */}
                 <div style={{
                   width: '100%',
-                  maxWidth: 320,
+                  maxWidth: 400,
                   aspectRatio: '1/1',
-                  background: '#0B1510',
-                  borderRadius: 32,
+                  background: '#F8FAF7',
+                  borderRadius: 40,
+                  border: '8px solid #E3EBE6',
                   margin: '0 auto 24px',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   position: 'relative', overflow: 'hidden',
-                  boxShadow: '0 24px 48px rgba(11, 21, 16, 0.4), inset 0 4px 12px rgba(255,255,255,0.1)',
+                  boxShadow: '0 24px 48px rgba(23,76,60,0.08), inset 0 4px 12px rgba(0,0,0,0.04)',
                 }}>
-                  {/* Neon Corner marks */}
-                  {[['0','0','top-left'], ['0','auto','bottom-left'], ['auto','0','top-right'], ['auto','auto','bottom-right']].map(([, , k]) => (
-                    <div key={k} style={{
-                      position: 'absolute',
-                      ...(k.includes('top') ? { top: 24 } : { bottom: 24 }),
-                      ...(k.includes('left') ? { left: 24 } : { right: 24 }),
-                      width: 40, height: 40,
-                      borderColor: '#C7F36B', borderStyle: 'solid', borderRadius: 8,
-                      borderWidth: k.includes('top-left') ? '4px 0 0 4px' :
-                        k.includes('top-right') ? '4px 4px 0 0' :
-                        k.includes('bottom-left') ? '0 0 4px 4px' : '0 4px 4px 0',
-                      boxShadow: '0 0 20px rgba(199,243,107,0.4)',
-                      opacity: cameraOn ? 1 : 0.4,
-                      transition: 'opacity 0.3s'
-                    }} />
-                  ))}
+                  {/* Corner marks overlay */}
+                  <div style={{
+                    position: 'absolute', inset: 32, pointerEvents: 'none', zIndex: 10,
+                    opacity: cameraOn ? 1 : 0.2, transition: 'opacity 0.4s ease'
+                  }}>
+                    {[['top', 'left'], ['top', 'right'], ['bottom', 'left'], ['bottom', 'right']].map(([y, x]) => (
+                      <div key={`${y}-${x}`} style={{
+                        position: 'absolute',
+                        [y]: 0, [x]: 0,
+                        width: 48, height: 48,
+                        borderColor: '#C7F36B', borderStyle: 'solid',
+                        borderWidth: y === 'top' && x === 'left' ? '6px 0 0 6px' :
+                                     y === 'top' && x === 'right' ? '6px 6px 0 0' :
+                                     y === 'bottom' && x === 'left' ? '0 0 6px 6px' : '0 6px 6px 0',
+                        borderRadius: y === 'top' && x === 'left' ? '12px 0 0 0' :
+                                      y === 'top' && x === 'right' ? '0 12px 0 0' :
+                                      y === 'bottom' && x === 'left' ? '0 0 0 12px' : '0 0 12px 0',
+                        boxShadow: '0 0 16px rgba(199,243,107,0.2)',
+                      }} />
+                    ))}
+                    
+                    {/* Scanning Laser */}
+                    {cameraOn && (
+                      <div style={{
+                        position: 'absolute', top: 20, left: 24, right: 24, height: 3,
+                        background: '#C7F36B',
+                        borderRadius: 2,
+                        boxShadow: '0 0 12px 2px rgba(199,243,107,0.8), 0 0 24px rgba(199,243,107,0.4)',
+                        animation: 'scanline 2.5s infinite cubic-bezier(0.4, 0, 0.2, 1)',
+                      }} />
+                    )}
+                  </div>
 
                   <div 
                     id="qr-reader-el" 
@@ -254,11 +279,11 @@ export default function ScanQR() {
                       }}>
                         <QrCode size={36} color="#C7F36B" />
                       </div>
-                      <div style={{ color: '#FFFFFF', fontSize: 16, fontWeight: 700, letterSpacing: '0.02em' }}>
-                        Scanner Offline
+                      <div style={{ color: '#1A2420', fontSize: 16, fontWeight: 700, letterSpacing: '0.02em' }}>
+                        Scanner Inactive
                       </div>
-                      <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, marginTop: 6 }}>
-                        Activate camera to begin scanning
+                      <div style={{ color: '#627068', fontSize: 13, marginTop: 6 }}>
+                        Activate camera to scan a ParkSync pass
                       </div>
                     </div>
                   )}

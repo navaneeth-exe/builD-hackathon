@@ -90,13 +90,18 @@ export default function NotificationCenter() {
 
       {isOpen && (
         <div 
-          className="soft-card"
           style={{
-            position: 'absolute', top: 45, right: 0,
+            position: 'absolute', top: 48, right: 0,
             width: 320, maxHeight: 400,
-            background: '#fff', zIndex: 1000,
+            background: 'rgba(255, 255, 255, 0.85)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            border: '1px solid rgba(227, 235, 230, 0.8)',
+            borderRadius: 24,
+            zIndex: 1000,
             display: 'flex', flexDirection: 'column',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+            boxShadow: '0 24px 48px rgba(23,76,60,0.12), 0 0 0 1px rgba(255,255,255,0.5) inset',
+            overflow: 'hidden'
           }}
         >
           <div style={{

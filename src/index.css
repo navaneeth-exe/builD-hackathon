@@ -165,6 +165,7 @@ body {
   padding: 0 28px;
   gap: 16px;
   box-shadow: 0 1px 0 rgba(23, 76, 60, 0.04), 0 2px 8px rgba(23, 76, 60, 0.03);
+  z-index: 50; /* Ensure topbar stays above page content */
 }
 
 .app-content {
@@ -1524,4 +1525,18 @@ body {
   .dashboard-hero-h1 {
     font-size: 24px;
   }
+}
+
+/* =========================================
+   QR Scanner Camera Overrides
+   ========================================= */
+#qr-reader-el {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#qr-reader-el video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
 }
