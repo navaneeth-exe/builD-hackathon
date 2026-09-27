@@ -172,6 +172,7 @@ body {
   overflow-y: auto;
   overflow-x: hidden; /* prevent horizontal scroll on the page level */
   padding: 28px;
+  min-height: 0; /* Add this to allow children to constrain height properly and scroll */
 }
 
 /* =========================================
@@ -1153,10 +1154,12 @@ body {
 .parking-map-scroll {
   width: 100%;
   overflow-x: auto;
+  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   /* Scrollbar visible */
   scrollbar-width: thin;
   scrollbar-color: #D5DDD8 transparent;
+  padding-bottom: 8px; /* space for scrollbar */
 }
 
 .parking-map-inner {
